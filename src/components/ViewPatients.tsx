@@ -12,6 +12,7 @@ interface BundleEntry {
 const PatientList: React.FC = () => {
   const [patients, setPatients] = useState<fhirR4.Patient[]>([]);
   const [searchText, setSearchText] = useState('');
+  const [filterAttribute, setFilterAttribute] = useState('');
 
   useEffect(() => {
     fetchPatients(); // Fetch patients when the component mounts
@@ -30,10 +31,47 @@ const PatientList: React.FC = () => {
     }
   };
 
+  const filterPatients = () => {
+    const filteredPatients = patients.filter(patient => {
+      if (filterAttribute === 'name') {
+        return patient.name?.[0]?.given?.[0].toLowerCase().includes(searchText.toLowerCase());
+      } else if (filterAttribute === 'birthDate') {
+        return patient.birthDate?.toLowerCase().includes(searchText.toLowerCase());
+      } else if (filterAttribute === 'identifier') {
+        return patient.identifier?.[0].value?.toString().toLowerCase().includes(searchText.toLowerCase());
+      } else {
+        // Add conditions for other attributes you want to filter by
+      }
+    });
+    return filteredPatients;
+  };
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  };
+
+  const handleAttributeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilterAttribute(event.target.value);
+  };
+
+  const handleRefresh = () => {
+    fetchPatients(); // Fetch patients again to refresh the data
+  };
 
   return (
     <div>
+
+        <div>
+          <select value={filterAttribute} onChange={handleAttributeChange}>
+            <option value="">Search by</option>
+            <option value="name">Name</option>
+            <option value="birthDate">Birth Date</option>
+            <option value="identifier">Identifier</option>
+            {/* Add options for other attributes */}
+          </select>
+        <input type="text" value={searchText} onChange={handleSearch} placeholder="Search" />
+        <button onClick={handleRefresh}>Refresh</button>
+      </div>
         <table>
             <thead>
             <tr>
@@ -53,7 +91,7 @@ const PatientList: React.FC = () => {
             </tr>
             </thead>
                 <tbody>
-                    {patients.map(patient => (
+                    {filterPatients().map(patient => (
                         <tr key={patient.id}>
                             <td>{patient.identifier?.[0]?.value}</td>
                             <td>{(patient.active? "aktiv": "inaktiv")}</td>
@@ -72,7 +110,6 @@ const PatientList: React.FC = () => {
                     ))}
                 </tbody>
         </table>
-
     </div>
   );
 };
