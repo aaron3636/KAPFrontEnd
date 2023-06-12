@@ -9,29 +9,35 @@ interface BundleEntry {
 }
 
 const PatientList: React.FC = () => {
+  // State variables
   const [patients, setPatients] = useState<fhirR4.Patient[]>([]);
   const [searchText, setSearchText] = useState("");
   const [filterAttribute, setFilterAttribute] = useState("");
 
+  // Fetch patients when the component mounts
   useEffect(() => {
-    fetchPatients(); // Fetch patients when the component mounts
+    fetchPatients();
   }, []);
 
+  // Fetch patients from the Server
   const fetchPatients = async () => {
     try {
       const response = await fetch("http://localhost:8080/fhir/Patient"); // Replace with your API endpoint
       const data = await response.json();
 
+      // Extract the resource property from the Bundle entry
       const patientsData = data.entry.map(
         (entry: BundleEntry) => entry.resource
-      ); // Extract the resource property
-      setPatients(patientsData); // Store the extracted patients in state
+      );
+      // Store the extracted patients in state
+      setPatients(patientsData);
       //console.log(patientsData);
     } catch (error) {
       console.error("Error fetching patients:", error);
     }
   };
 
+  // Filter patients based on the selected attribute and search text
   const filterPatients = () => {
     const filteredPatients = patients.filter((patient) => {
       if (filterAttribute === "name") {
@@ -54,16 +60,17 @@ const PatientList: React.FC = () => {
     return filteredPatients;
   };
 
+  // Handle search input change
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
   };
-
+  // Handle attribute selection change
   const handleAttributeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setFilterAttribute(event.target.value);
   };
-
+  // Refresh the patient data by fetching patients again
   const handleRefresh = () => {
     fetchPatients(); // Fetch patients again to refresh the data
   };
@@ -105,6 +112,7 @@ const PatientList: React.FC = () => {
     }
   };
 
+  // Generate the patient address based on the address data
   const generatePatientAddress = (patient: fhirR4.Patient) => {
     if (patient.address && patient.address.length > 0) {
       const firstAddress = patient.address[0];

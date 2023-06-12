@@ -3,16 +3,22 @@ import { fhirR4 } from "@smile-cdr/fhirts";
 import { v4 as uuidv4 } from "uuid";
 
 const PatientForm: React.FC = () => {
+  // State variables
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
+  /**
+   * Handles the form submission event.
+   * POST to "http://localhost:8080/fhir/Patient"
+   * @param e - The form submission event.
+   */
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    // Create a new identifier for the patient
     const newIdentifier = new fhirR4.Identifier();
     newIdentifier.value = (
       e.currentTarget.elements.namedItem("identifier") as HTMLInputElement
     ).value;
-
+    // Create a new human name for the patient
     const newHumanName = new fhirR4.HumanName();
     newHumanName.prefix = [
       (e.currentTarget.elements.namedItem("DrorProf") as HTMLInputElement)
@@ -24,7 +30,7 @@ const PatientForm: React.FC = () => {
     newHumanName.given = [
       (e.currentTarget.elements.namedItem("Vorname") as HTMLInputElement).value,
     ];
-
+    // Get the gender value and validate it
     let genderValue = (
       e.currentTarget.elements.namedItem("gender") as HTMLInputElement
     ).value;
@@ -35,26 +41,26 @@ const PatientForm: React.FC = () => {
       genderValue === "unknown"
         ? genderValue
         : undefined;
-
+    // Construct the birth date in the required format
     const db =
       (e.currentTarget.elements.namedItem("year") as HTMLInputElement).value +
       "-" +
       (e.currentTarget.elements.namedItem("month") as HTMLInputElement).value +
       "-" +
       (e.currentTarget.elements.namedItem("day") as HTMLInputElement).value;
-
+    // Create a new contact point for email
     const newEmail = new fhirR4.ContactPoint();
     newEmail.system = "email";
     newEmail.value = (
       e.currentTarget.elements.namedItem("email") as HTMLInputElement
     ).value;
-
+    // Create a new contact point for phone
     const newPhone = new fhirR4.ContactPoint();
     newPhone.system = "phone";
     newPhone.value = (
       e.currentTarget.elements.namedItem("phone") as HTMLInputElement
     ).value;
-
+    // Create a new address for the patient
     const newAdresss = new fhirR4.Address();
     newAdresss.line = [
       (e.currentTarget.elements.namedItem("street_number") as HTMLInputElement)
@@ -72,7 +78,7 @@ const PatientForm: React.FC = () => {
     newAdresss.country = (
       e.currentTarget.elements.namedItem("country") as HTMLInputElement
     ).value;
-
+    //Create the Patient
     const newPatient: fhirR4.Patient = {
       identifier: [newIdentifier], // An identifier for this patient
       active: (e.currentTarget.elements.namedItem("active") as HTMLInputElement)
@@ -97,15 +103,14 @@ const PatientForm: React.FC = () => {
       const photoAttachment: fhirR4.Attachment = {
         contentType: photoFile.type,
         data: "",
-        id: uuidv4(), // You can generate a unique ID for the photo attachment
+        id: uuidv4(), // Generate a unique ID for the attachment
       };
       const reader = new FileReader();
       reader.onload = () => {
         if (typeof reader.result === "string") {
           photoAttachment.data = reader.result.split(",")[1] || "";
           newPatient.photo = [photoAttachment];
-          // submit the patient data with the photo attachment
-          // Example: Output patient data to the console
+          // Submiting the patient data with the attachment
           // console.log(JSON.stringify(newPatient));
           fetch("http://localhost:8080/fhir/Patient", {
             method: "POST",
@@ -127,7 +132,7 @@ const PatientForm: React.FC = () => {
       };
       reader.readAsDataURL(photoFile);
     } else {
-      // Submit the patient data without the photo attachment ...
+      // Submiting the patient data without the attachment.
       console.log(newPatient);
       fetch("http://localhost:8080/fhir/Patient", {
         method: "POST",
