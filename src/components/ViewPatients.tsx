@@ -8,11 +8,18 @@ interface BundleEntry {
   // Define other properties of the Bundle entry if needed ---> Extensions if needed
 }
 
+interface Patient extends fhirR4.Patient {
+  identifier?: fhirR4.Identifier[];
+  name?: fhirR4.HumanName[];
+  birthDate?: string;
+}
+
 const PatientList: React.FC = () => {
   // State variables
   const [patients, setPatients] = useState<fhirR4.Patient[]>([]);
   const [searchText, setSearchText] = useState("");
   const [filterAttribute, setFilterAttribute] = useState("");
+  const [sortAttribute, setSortAttribute] = useState("");
 
   // Fetch patients when the component mounts
   useEffect(() => {
@@ -44,6 +51,10 @@ const PatientList: React.FC = () => {
         return patient.name?.[0]?.given?.[0]
           .toLowerCase()
           .includes(searchText.toLowerCase());
+      } else if (filterAttribute === "family") {
+        return patient.name?.[0].family
+          ?.toLowerCase()
+          .includes(searchText.toLowerCase());
       } else if (filterAttribute === "birthDate") {
         return patient.birthDate
           ?.toLowerCase()
@@ -60,16 +71,66 @@ const PatientList: React.FC = () => {
     return filteredPatients;
   };
 
+  /**
+   * Sorts an array of patients based on the specified sort attribute.
+   * @param patients - The array of patients to be sorted.
+   * @param sortAttribute - The attribute to sort the patients by ("name", "birthDate", "family", etc.).
+   * @returns The sorted array of patients.
+   */
+  const sortPatients = (patients: Patient[], sortAttribute: string) => {
+    /**
+     * Gets the value of the specified attribute for a given patient.
+     * @param patient - The patient object.
+     * @returns The value of the attribute or undefined if not found.
+     */
+    const getValue = (patient: Patient) => {
+      switch (sortAttribute) {
+        case "name":
+          return patient.name?.[0]?.given?.[0];
+        case "birthDate":
+          return patient.birthDate;
+        case "family":
+          return patient.name?.[0]?.family;
+        // Add cases for other attributes you want to sort by
+        default:
+          return undefined;
+      }
+    };
+
+    return patients.sort((patientOne: Patient, patientTwo: Patient) => {
+      const patientOneValue = getValue(patientOne);
+      const patientTwoValue = getValue(patientTwo);
+
+      if (patientOneValue === undefined || patientTwoValue === undefined) {
+        return 0;
+      }
+
+      return patientOneValue.localeCompare(patientTwoValue);
+    });
+  };
+
+  const filterAndSortPatients = () => {
+    const filteredPatients = filterPatients();
+    const sortedPatients = sortPatients(filteredPatients, sortAttribute);
+    return sortedPatients;
+  };
+
   // Handle search input change
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
   };
-  // Handle attribute selection change
-  const handleAttributeChange = (
+  // Handle attributes selection change
+  const handleFilterAttributeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setFilterAttribute(event.target.value);
   };
+  const handleSortAttributeChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setSortAttribute(event.target.value);
+  };
+
   // Refresh the patient data by fetching patients again
   const handleRefresh = () => {
     fetchPatients(); // Fetch patients again to refresh the data
@@ -138,16 +199,31 @@ const PatientList: React.FC = () => {
 
   return (
     <div>
-      <div className="flex items-center mb-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+      <div className="flex justify-center p-10 bg-sky-800 text-4xl text-white mb-10">
+        What are you looking for?
+      </div>
+      <div className="flex items-center mb-4 font-mono md:font-mono text-lg/5 md:text-lg/5 justify-center">
         <select
           className="rounded border-b-2 mr-2 font-mono md:font-mono text-lg/5 md:text-lg/5"
           value={filterAttribute}
-          onChange={handleAttributeChange}
+          onChange={handleFilterAttributeChange}
         >
           <option value="">Search by</option>
           <option value="name">Name</option>
+          <option value="family">Family Name</option>
           <option value="birthDate">Birth Date</option>
           <option value="identifier">Identifier</option>
+          {/* Add options for other attributes */}
+        </select>
+        <select
+          className="rounded border-b-2 mr-2 font-mono md:font-mono text-lg/5 md:text-lg/5"
+          value={sortAttribute}
+          onChange={handleSortAttributeChange}
+        >
+          <option value="">Sort by</option>
+          <option value="name">Name</option>
+          <option value="family">Family Name</option>
+          <option value="birthDate">Birth Date</option>
           {/* Add options for other attributes */}
         </select>
         <input
@@ -200,7 +276,7 @@ const PatientList: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {filterPatients().map((patient) => (
+          {filterAndSortPatients().map((patient) => (
             <tr key={patient.id}>
               <td className="p-4 font-mono md:font-mono text-lg/2 md:text-lg/2 whitespace-nowrap">
                 {patient.identifier?.[0]?.value === undefined ? (
