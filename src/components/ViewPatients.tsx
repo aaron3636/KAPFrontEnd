@@ -1,18 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { fhirR4 } from "@smile-cdr/fhirts";
-
-// Assuming you have defined appropriate types for Identifier, HumanName, Address, and Contact
-
-interface BundleEntry {
-  resource: fhirR4.Patient;
-  // Define other properties of the Bundle entry if needed ---> Extensions if needed
-}
-
-interface Patient extends fhirR4.Patient {
-  identifier?: fhirR4.Identifier[];
-  name?: fhirR4.HumanName[];
-  birthDate?: string;
-}
+import BundleEntry from "./BundleEntry";
+import { filterPatients, sortPatients } from "./utils";
 
 const PatientList: React.FC = () => {
   // State variables
@@ -31,7 +20,6 @@ const PatientList: React.FC = () => {
     try {
       const response = await fetch("http://localhost:8080/fhir/Patient"); // Replace with your API endpoint
       const data = await response.json();
-
       // Extract the resource property from the Bundle entry
       const patientsData = data.entry.map(
         (entry: BundleEntry) => entry.resource
@@ -45,72 +33,13 @@ const PatientList: React.FC = () => {
   };
 
   // Filter patients based on the selected attribute and search text
-  const filterPatients = () => {
-    const filteredPatients = patients.filter((patient) => {
-      if (filterAttribute === "name") {
-        return patient.name?.[0]?.given?.[0]
-          .toLowerCase()
-          .includes(searchText.toLowerCase());
-      } else if (filterAttribute === "family") {
-        return patient.name?.[0].family
-          ?.toLowerCase()
-          .includes(searchText.toLowerCase());
-      } else if (filterAttribute === "birthDate") {
-        return patient.birthDate
-          ?.toLowerCase()
-          .includes(searchText.toLowerCase());
-      } else if (filterAttribute === "identifier") {
-        return patient.identifier?.[0].value
-          ?.toString()
-          .toLowerCase()
-          .includes(searchText.toLowerCase());
-      } else {
-        // Add conditions for other attributes you want to filter by
-      }
-    });
-    return filteredPatients;
-  };
-
-  /**
-   * Sorts an array of patients based on the specified sort attribute.
-   * @param patients - The array of patients to be sorted.
-   * @param sortAttribute - The attribute to sort the patients by ("name", "birthDate", "family", etc.).
-   * @returns The sorted array of patients.
-   */
-  const sortPatients = (patients: Patient[], sortAttribute: string) => {
-    /**
-     * Gets the value of the specified attribute for a given patient.
-     * @param patient - The patient object.
-     * @returns The value of the attribute or undefined if not found.
-     */
-    const getValue = (patient: Patient) => {
-      switch (sortAttribute) {
-        case "name":
-          return patient.name?.[0]?.given?.[0];
-        case "birthDate":
-          return patient.birthDate;
-        case "family":
-          return patient.name?.[0]?.family;
-        // Add cases for other attributes you want to sort by
-        default:
-          return undefined;
-      }
-    };
-
-    return patients.sort((patientOne: Patient, patientTwo: Patient) => {
-      const patientOneValue = getValue(patientOne);
-      const patientTwoValue = getValue(patientTwo);
-
-      if (patientOneValue === undefined || patientTwoValue === undefined) {
-        return 0;
-      }
-
-      return patientOneValue.localeCompare(patientTwoValue);
-    });
-  };
 
   const filterAndSortPatients = () => {
-    const filteredPatients = filterPatients();
+    const filteredPatients = filterPatients(
+      patients,
+      filterAttribute,
+      searchText
+    );
     const sortedPatients = sortPatients(filteredPatients, sortAttribute);
     return sortedPatients;
   };
