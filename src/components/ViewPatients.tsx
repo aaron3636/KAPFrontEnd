@@ -1,7 +1,13 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { fhirR4 } from "@smile-cdr/fhirts";
 import BundleEntry from "./BundleEntry";
-import { filterPatients, sortPatients } from "./utils";
+import {
+  filterPatients,
+  sortPatients,
+  renderPatientPhotos,
+  generatePatientAddress,
+} from "./utils";
+import HomeButton from "./HomeButton";
 
 const PatientList: React.FC = () => {
   // State variables
@@ -65,70 +71,12 @@ const PatientList: React.FC = () => {
     fetchPatients(); // Fetch patients again to refresh the data
   };
 
-  /**
-   * Renders the patient photos.
-   *
-   * @param {fhirR4.Patient} patient - The patient object containing photo information.
-   * @returns {JSX.Element[]} - An array of JSX elements representing the patient photos.
-   */
-  const renderPatientPhotos = (patient: fhirR4.Patient) => {
-    if (!patient.photo || patient.photo.length === 0) {
-      return <td>No attachment available</td>;
-    }
-    return patient.photo.map((photo) => {
-      const imgSrc = getCachedPhotoUrl(photo);
-      return <img key={photo.id} src={imgSrc} alt="Patient Photo" />;
-    });
-  };
-
-  /**
-   * Gets the cached photo URL or creates a new cache entry.
-   *
-   * @param {fhirR4.Attachment} photo - The photo object containing data and content type.
-   * @returns {string} - The URL of the cached photo or an empty string if not available.
-   */
-  const getCachedPhotoUrl = (photo: fhirR4.Attachment) => {
-    if (!photo || !photo.data) return "";
-
-    const cacheKey = `${photo.id}-${photo.data}`;
-    const cachedImage = localStorage.getItem(cacheKey);
-
-    if (cachedImage) {
-      return cachedImage;
-    } else {
-      const image = `data:${photo.contentType};base64,${photo.data}`;
-      localStorage.setItem(cacheKey, image);
-      return image;
-    }
-  };
-
-  // Generate the patient address based on the address data
-  const generatePatientAddress = (patient: fhirR4.Patient) => {
-    if (patient.address && patient.address.length > 0) {
-      const firstAddress = patient.address[0];
-      if (firstAddress.text) {
-        // Address is stored as a single text value
-        return <td>{firstAddress.text}</td>;
-      } else if (
-        firstAddress.line &&
-        firstAddress.city &&
-        firstAddress.state &&
-        firstAddress.postalCode
-      ) {
-        // Address is stored separately with line, city, state, and postalCode properties
-        const { line, city, state, postalCode } = firstAddress;
-        const addressString = `${line.join(
-          ", "
-        )} ${city}, ${state} ${postalCode}`;
-        return <td>{addressString}</td>;
-      }
-    }
-    return <td>No address available</td>;
-  };
-
   return (
     <div>
-      <div className="flex justify-center p-10 bg-sky-800 text-4xl text-white mb-10">
+      <div>
+        <HomeButton />
+      </div>
+      <div className="flex justify-center h-auto p-10 bg-sky-800 text-4xl text-white mb-10 w-auto overflow-x-auto">
         What are you looking for?
       </div>
       <div className="flex items-center mb-4 font-mono md:font-mono text-lg/5 md:text-lg/5 justify-center">
@@ -228,25 +176,21 @@ const PatientList: React.FC = () => {
               <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
                 {patient.gender}
               </td>
-              <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+              <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 whitespace-nowrap">
                 {patient.birthDate}
               </td>
               {/* Phone */}
-              <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+              <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 whitespace-nowrap">
                 {patient.telecom?.[0]?.value === undefined ? (
-                  <div className="flex items-center justify-center h-full">
-                    Nun
-                  </div>
+                  <div className="flex items-center justify-center">Nun</div>
                 ) : (
                   patient.telecom?.[0]?.value
                 )}
               </td>
               {/* Mail */}
-              <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+              <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 whitespace-nowrap">
                 {patient.telecom?.[1]?.value === undefined ? (
-                  <div className="flex items-center justify-center h-full">
-                    Nun
-                  </div>
+                  <div className="flex items-center justify-center">Nun</div>
                 ) : (
                   patient.telecom?.[1]?.value
                 )}
@@ -254,7 +198,7 @@ const PatientList: React.FC = () => {
               <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
                 {generatePatientAddress(patient)}
               </td>
-              <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 h-auto max-w-sm hover:shadow-lg dark:shadow-black/30">
+              <td className="p-4 flex justify-center font-mono md:font-mono text-lg/5 md:text-lg/5 h-auto max-w-sm hover:shadow-lg dark:shadow-black/30">
                 {renderPatientPhotos(patient)}
               </td>
             </tr>
