@@ -1,5 +1,6 @@
 import { fhirR4 } from "@smile-cdr/fhirts";
 import Patient from "./Patient";
+import React, { useState, useEffect } from "react";
 
 export const filterPatients = (
   patients: Patient[],
@@ -70,22 +71,71 @@ export const sortPatients = (patients: Patient[], sortAttribute: string) => {
 };
 
 /**
+ * Renders the patient photos and provides an interactive display.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {fhirR4.Patient} props.patient - The patient object containing photo information.
+ * @returns {JSX.Element} - The rendered component.
+ */
+
+const RenderPatientPhotos = ({ patient }: { patient: fhirR4.Patient }) => {
+  const [selectedPhoto, setSelectedPhoto] = useState<fhirR4.Attachment | null>(
+    null
+  );
+
+  const handlePhotoClick = (photo: fhirR4.Attachment) => {
+    setSelectedPhoto(photo);
+  };
+
+  if (!patient.photo || patient.photo.length === 0) {
+    return <span className="text-gray-400">No attachment available</span>;
+  }
+
+  return (
+    <div className="flex flex-wrap">
+      {patient.photo.map((photo) => (
+        <div
+          key={photo.id}
+          className="w-50 h-50 bg-gray-400 rounded-lg overflow-hidden mx-1 my-1 cursor-pointer"
+          onClick={() => handlePhotoClick(photo)}
+        >
+          <img
+            src={getCachedPhotoUrl(photo)}
+            alt="Patient Attachment"
+            className="object-cover w-full h-full"
+          />
+        </div>
+      ))}
+      {selectedPhoto && (
+        <div
+          className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <img
+            src={getCachedPhotoUrl(selectedPhoto)}
+            alt="Selected Photo"
+            className="max-w-full max-h-full"
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+/**
  * Renders the patient photos.
  *
  * @param {fhirR4.Patient} patient - The patient object containing photo information.
- * @returns {JSX.Element[]} - An array of JSX elements representing the patient photos.
+ * @returns {JSX.Element | string} - JSX element representing the patient photos or a string indicating no attachment available.
  */
 
 export const renderPatientPhotos = (patient: fhirR4.Patient) => {
   if (!patient.photo || patient.photo.length === 0) {
     return "No attachment available";
   }
-  return patient.photo.map((photo) => {
-    const imgSrc = getCachedPhotoUrl(photo);
-    return <img key={photo.id} src={imgSrc} alt="Patient Attachement" />;
-  });
+  return <RenderPatientPhotos patient={patient} />;
 };
-
 /**
  * Gets the cached photo URL or creates a new cache entry.
  *
