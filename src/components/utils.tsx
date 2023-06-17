@@ -1,6 +1,6 @@
 import { fhirR4 } from "@smile-cdr/fhirts";
 import Patient from "./Patient";
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 
 export const filterPatients = (
   patients: Patient[],
