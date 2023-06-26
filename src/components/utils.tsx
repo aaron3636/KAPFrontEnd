@@ -1,7 +1,5 @@
 import { fhirR4 } from "@smile-cdr/fhirts";
-//import Patient from "./Patient";
 import { useState } from "react";
-import BundleEntry from "./BundleEntry";
 
 export const filterPatients = (
   patients: fhirR4.Patient[],
@@ -27,7 +25,7 @@ export const filterPatients = (
         .toLowerCase()
         .includes(searchText.toLowerCase());
     } else {
-      // Add conditions for other attributes you want to filter by
+      return null;
     }
   });
   return filteredPatients;
@@ -120,7 +118,7 @@ const RenderPatientPhotos = ({ patient }: { patient: fhirR4.Patient }) => {
         >
           <img
             src={getCachedPhotoUrl(selectedPhoto)}
-            alt="Selected Photo"
+            alt="Latest observation"
             className="max-w-full max-h-full"
           />
         </div>
