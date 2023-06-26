@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useParams } from "react-router-dom";
 import { fhirR4 } from "@smile-cdr/fhirts";
 import { renderPatientPhotos, generatePatientAddress } from "./utils";
@@ -6,14 +6,16 @@ import HomeButton from "./HomeButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
+import EditPatientForm from "./EditPatientForm";
 
 const PatientDetails = () => {
   const { patientId } = useParams();
   const [patient, setPatient] = useState<fhirR4.Patient | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editedPatient, setEditedPatient] = useState<fhirR4.Patient | null>(
-    null
+  const [editedPatient, setEditedPatient] = useState<fhirR4.Patient>(
+    {} as fhirR4.Patient
   );
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,7 +38,13 @@ const PatientDetails = () => {
   // Function to handle the edit button click
   const handleEdit = () => {
     setIsEditMode(true);
-    setEditedPatient(patient);
+    if (patient) {
+      setEditedPatient(patient);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
   };
 
   // Function to handle the SAVE
@@ -44,7 +52,11 @@ const PatientDetails = () => {
    * (This do nothings till now as the edit capabilty is not yet implemented!).
    * PLEASE DON´T TOUCH THE SAVE ICON :) .
    */
-  const handleSave = async () => {
+  const handleSave = async (
+    event: FormEvent,
+    editedPatient: fhirR4.Patient
+  ) => {
+    event.preventDefault();
     try {
       const response = await fetch(
         `http://localhost:8080/fhir/Patient/${patientId}`,
@@ -57,11 +69,9 @@ const PatientDetails = () => {
         }
       );
       if (response.ok) {
-        // Save operation successful
         setPatient(editedPatient);
         setIsEditMode(false);
       } else {
-        // Save operation failed
         console.error("Failed to save patient data");
       }
     } catch (error) {
@@ -79,11 +89,8 @@ const PatientDetails = () => {
         }
       );
       if (response.ok) {
-        console.log(response);
-        // Delete operation successful
         navigate(`/patient`);
       } else {
-        // Delete operation failed
         console.error("Failed to delete patient");
       }
     } catch (error) {
@@ -95,6 +102,15 @@ const PatientDetails = () => {
   const renderPatientDetails = () => {
     if (!patient) {
       return <p className="text-gray-500 text-lg">Loading...</p>;
+    }
+    if (isEditMode) {
+      return (
+        <EditPatientForm
+          patient={patient}
+          onSave={handleSave}
+          onCancel={handleCancelEdit}
+        />
+      );
     }
 
     return (
@@ -152,17 +168,10 @@ const PatientDetails = () => {
           <div className="flex justify-center mt-4">
             <button
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
-              onClick={handleSave}
+              onClick={(event) => handleSave(event, editedPatient)}
             >
               <FontAwesomeIcon icon={faSave} className="mr-2" />
               Save
-            </button>
-            <button
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-              onClick={handleDelete}
-            >
-              <FontAwesomeIcon icon={faTrash} className="mr-2" />
-              Delete
             </button>
           </div>
         ) : (
@@ -173,6 +182,13 @@ const PatientDetails = () => {
             >
               <FontAwesomeIcon icon={faEdit} className="mr-2" />
               Edit
+            </button>
+            <button
+              className="ml-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              onClick={handleDelete}
+            >
+              <FontAwesomeIcon icon={faTrash} className="mr-2" />
+              Delete
             </button>
           </div>
         )}
