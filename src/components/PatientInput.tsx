@@ -413,23 +413,30 @@ const PatientForm: React.FC = () => {
           </button>
         </div>
         {submissionStatus && (
-          <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-            <div className="notification bg-white p-4 rounded-md">
-              <div className="flex justify-between items-center mb-2">
-                <p>
-                  {submissionStatus === "success"
-                    ? "Submission successful!"
-                    : "Submission failed. Please try again."}
-                </p>
-                <button
-                  className="text-gray-800 hover:text-gray-600"
-                  onClick={handleCloseNotification}
-                >
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    className="h-5 w-5 text-gray-800 hover:text-gray-600"
-                  />
-                </button>
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-filter backdrop-blur-sm flex items-center justify-center">
+              <div className="max-w-md mx-auto">
+                <div className="bg-white shadow-lg rounded-lg p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <p className="text-lg font-semibold mr-2">
+                      {submissionStatus === "success"
+                        ? "Submission successful!"
+                        : "Submission failed. Please try again."}
+                    </p>
+                    <button
+                      className="text-gray-800 hover:text-gray-600"
+                      onClick={handleCloseNotification}
+                    >
+                      <FontAwesomeIcon
+                        icon={faTimes}
+                        className="h-5 w-5 text-gray-800 hover:text-red-400"
+                      />
+                    </button>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Patient was successfully added to the Database.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
