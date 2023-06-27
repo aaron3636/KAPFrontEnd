@@ -5,6 +5,7 @@ import PatientForm from "./components/PatientInput";
 import PatientList from "./components/ViewPatients";
 import Welcome from "./components/Welcome";
 import PatientDetails from "./components/PatientDetails";
+import ObservationForm from "./components/ObservationInput";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/patient" element={<PatientList />} />
           <Route path="/add" element={<PatientForm />} />
           <Route path="/patient/:patientId" element={<PatientDetails />} />
+          <Route path="/AddObservation/:patientId" element={<ObservationForm />} />
         </Routes>
       </div>
     </Router>

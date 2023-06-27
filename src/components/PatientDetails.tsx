@@ -98,6 +98,19 @@ const PatientDetails = () => {
     }
   };
 
+
+  const handleClick = async (patientId: string | undefined) => {
+    
+    if (patientId) {
+      // Navigate to the patient detail page with the patientId as a parameter
+      navigate(`/AddObservation/${patientId}`);
+    }
+    
+
+  }
+
+
+
   // Render patient details
   const renderPatientDetails = () => {
     if (!patient) {
@@ -175,6 +188,7 @@ const PatientDetails = () => {
             </button>
           </div>
         ) : (
+
           <div className="flex justify-center mt-4">
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -194,9 +208,10 @@ const PatientDetails = () => {
         )}
         {/* Render other patient details */}
       </div>
+  
     );
   };
-
+  
   return (
     <div>
       <div>
@@ -207,8 +222,15 @@ const PatientDetails = () => {
           {patient?.name?.[0]?.given + " " + patient?.name?.[0]?.family}
         </div>
       </div>
-      <div className="flex items-center justify-center min-h-screen">
-        {renderPatientDetails()}
+      <div className="flex justify-center">
+        {renderPatientDetails()} 
+      </div>
+      <div className="flex justify-center">
+        <button 
+          onClick={() => handleClick(patient?.id)}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 m-4 rounded text-lg ">
+            Add Observation
+        </button>
       </div>
     </div>
   );

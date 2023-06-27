@@ -23,6 +23,10 @@ function Welcome() {
           <span className="welcome-screen-option-icon">✏️</span>
           <span className="welcome-screen-option-text">Edit a Patient</span>
         </Link>
+        <Link to="/AddObservation" className="welcome-screen-option edit">
+          <span className="welcome-screen-option-icon">✏️</span>
+          <span className="welcome-screen-option-text">observation</span>
+        </Link>
       </div>
     </div>
   );
