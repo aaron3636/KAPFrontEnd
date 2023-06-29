@@ -162,6 +162,8 @@ const getCachedPhotoUrl = (photo: fhirR4.Attachment) => {
   }
 };
 
+
+
 /**
  * Generates the patient address element based on the address data.
  *
@@ -189,4 +191,81 @@ export const generatePatientAddress = (patient: fhirR4.Patient) => {
     }
   }
   return "No address available";
+};
+
+export const filterMedia = (
+  images: fhirR4.Media[],
+  filterAttribute: string,
+  searchText: string
+) => {
+  const filteredMedia = images.filter((image) => {
+    if (filterAttribute === "identifier") {
+      return image.identifier?.[0]?.value
+        ?.toLowerCase()
+        .includes(searchText.toLowerCase());
+    } else if (filterAttribute === "status") {
+      return image.status
+        ?.toLowerCase()
+        .includes(searchText.toLowerCase());
+    } else if (filterAttribute === "type") {
+      return image.type?.coding?.[0]?.code
+        ?.toLowerCase()
+        .includes(searchText.toLowerCase());
+    } else if (filterAttribute === "dateTime") {
+      return image.createdDateTime
+        ?.toString()
+        .toLowerCase()
+        .includes(searchText.toLowerCase());
+    } else if (filterAttribute === "bodySite") {
+      return image.bodySite?.coding?.[0]?.code
+        ?.toString()
+        .toLowerCase()
+        .includes(searchText.toLowerCase());
+    } else {
+      return null;
+    }
+  });
+  return filteredMedia;
+};
+
+
+export const sortMedia = (
+  images: fhirR4.Media[],
+  sortAttribute: string
+) => {
+  /**
+   * Gets the value of the specified attribute for a given observation or Media.
+   * @param observation or Media - The patient object.
+   * @returns The value of the attribute or undefined if not found.
+   */
+  const getValue = (image: fhirR4.Media) => {
+    switch (sortAttribute) {
+      case "identifier":
+        return image.identifier?.[0].value;
+      case "status":
+        return image.status;
+      case "type":
+        return image.type?.coding?.[0]?.code;
+      case "dateTime":
+        return image.createdDateTime;
+      case "bodySite":
+        return image.bodySite?.coding?.[0]?.code;     
+      // Add cases for other attributes you want to sort by
+      default:
+        return undefined;
+    }
+  };
+
+  return images.sort(
+    (imageOne: fhirR4.Media, imageTwo: fhirR4.Media) => {
+      const imageOneValue = getValue(imageOne);
+      const imageTwoValue = getValue(imageTwo);
+
+      if (imageOneValue === undefined || imageTwoValue === undefined) {
+        return 0;
+      }
+
+      return imageOneValue.localeCompare(imageTwoValue);
+    }
+  );
 };

@@ -7,11 +7,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import EditPatientForm from "./EditPatientForm";
+import BundleEntry from "./BundleEntry";
+import {
+  filterMedia,
+  sortMedia,
+} from "./utils";
 
 const PatientDetails = () => {
   const { patientId } = useParams();
   const [patient, setPatient] = useState<fhirR4.Patient | null>(null);
+  const [media, setMedia] = useState<fhirR4.Media[]>([]);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [filterAttribute, setFilterAttribute] = useState("");
+  const [sortAttribute, setSortAttribute] = useState("");
   const [editedPatient, setEditedPatient] = useState<fhirR4.Patient>(
     {} as fhirR4.Patient
   );
@@ -20,7 +29,8 @@ const PatientDetails = () => {
 
   useEffect(() => {
     fetchPatient();
-  }, [patientId]);
+    fetchMedia();
+}, [patientId]);
 
   const fetchPatient = async () => {
     try {
@@ -30,6 +40,23 @@ const PatientDetails = () => {
       const data = await response.json();
       //console.log(data);
       setPatient(data);
+    } catch (error) {
+      console.error("Error fetching patient:", error);
+    }
+  };
+
+  const fetchMedia = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/fhir/Media?subject=${patientId}`
+      );
+      const data = await response.json();
+      const patientsData = data.entry.map(
+        (entry: BundleEntry) => entry.resource
+      );
+
+      console.log(patientsData);
+      setMedia(patientsData);
     } catch (error) {
       console.error("Error fetching patient:", error);
     }
@@ -103,11 +130,41 @@ const PatientDetails = () => {
     
     if (patientId) {
       // Navigate to the patient detail page with the patientId as a parameter
-      navigate(`/AddObservation/${patientId}`);
+      navigate(`/AddMedia/${patientId}`);
     }
-    
 
   }
+
+  const filterAndSortMedia = () => {
+    const filteredPatients = filterMedia(
+      media,
+      filterAttribute,
+      searchText
+    );
+    const sortedPatients = sortMedia(filteredPatients, sortAttribute);
+    return sortedPatients;
+  };
+
+  // Handle search input change
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  };
+  // Handle attributes selection change
+  const handleFilterAttributeChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setFilterAttribute(event.target.value);
+  };
+  const handleSortAttributeChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setSortAttribute(event.target.value);
+  };
+
+  // Refresh the patient data by fetching patients again
+  const handleRefresh = () => {
+    fetchMedia(); // Fetch patients again to refresh the data
+  };
 
 
 
@@ -226,12 +283,138 @@ const PatientDetails = () => {
         {renderPatientDetails()} 
       </div>
       <div className="flex justify-center">
+        
+      </div>
+
+      <div className="flex justify-center">
+        <h1 className="text-2xl font-bold m-4">Patient Media</h1>
+
         <button 
           onClick={() => handleClick(patient?.id)}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 m-4 rounded text-lg ">
-            Add Observation
+            Add Media
         </button>
       </div>
+
+
+      <div className="flex flex-wrap items-center mb-4 font-mono md:font-mono text-lg/5 md:text-lg/5 justify-center">
+        <select
+          className="rounded border-b-2 mr-2 font-mono md:font-mono text-lg/5 md:text-lg/5 mb-2 md:mb-0"
+          value={filterAttribute}
+          onChange={handleFilterAttributeChange}
+        >
+          <option value="">Search by</option>
+          <option value="identifier">Identifier</option>
+          <option value="status">Status</option>
+          <option value="type">Type of Media</option>
+          <option value="dateTime">Date Time</option>
+          <option value="bodySite">Body Site</option>
+          {/* Add options for other attributes */}
+        </select>
+        <select
+          className="rounded border-b-2 mr-2 font-mono md:font-mono text-lg/5 md:text-lg/5 mb-2 md:mb-0"
+          value={sortAttribute}
+          onChange={handleSortAttributeChange}
+        >
+          <option value="">Sort by</option>
+          <option value="identifier">Identifier</option>
+          <option value="status">Status</option>
+          <option value="type">Type of Media</option>
+          <option value="dateTime">Date Time</option>
+          <option value="bodySite">Body Site</option>
+          {/* Add options for other attributes */}
+        </select>
+        <input
+          className="rounded border-b-2 mr-2"
+          type="text"
+          value={searchText}
+          onChange={handleSearch}
+          placeholder="Search"
+        />
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={handleRefresh}
+        >
+          Refresh
+        </button>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr>
+              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+                Identifier
+              </th>
+              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+                Status
+              </th>
+              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+                Type
+              </th>
+              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+                Date Time
+              </th>
+              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+                Body Site
+              </th>
+              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+                Note
+              </th>
+              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+                Content
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filterAndSortMedia().map((image) => (
+              <tr
+                key={image.id}
+                className="cursor-pointer hover:bg-gray-100"
+              >
+                <td className="p-4 font-mono md:font-mono text-lg/2 md:text-lg/2 whitespace-nowrap">
+                  {image.identifier?.[0]?.value === undefined ? (
+                    <div className="flex items-center justify-center h-full">
+                      Nun
+                    </div>
+                  ) : (
+                    image.identifier?.[0]?.value
+                  )}
+                </td>
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+                  {image.status}
+                </td>
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+                  {image.type?.coding?.[0]?.code}
+                </td>
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+                  {image.createdDateTime}
+                </td>
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+                  {image.bodySite?.coding?.[0]?.code}
+                </td>
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 whitespace-nowrap">
+                  {image.note?.[0]?.text}
+                </td>
+               { <td className="p-4 flex justify-center font-mono md:font-mono text-lg/5 md:text-lg/5 h-auto max-w-sm hover:shadow-lg dark:shadow-black/30">
+                      <div
+                        key={image.id}
+                        className="w-20 h-20 bg-gray-400 rounded-lg overflow-hidden mx-1 my-1 cursor-pointer"
+                        >
+                      <img
+                        src={`data:${image.content.contentType};base64,${image.content.data}`}
+                        alt="Patient Attachment"
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                  </td>}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+
+  
     </div>
   );
 };
