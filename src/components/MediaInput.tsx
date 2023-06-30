@@ -1,13 +1,9 @@
 import React, { useState } from "react";
 import { fhirR4 } from "@smile-cdr/fhirts";
 import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import HomeButton from "./HomeButton";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
-
-import { noAuto } from "@fortawesome/fontawesome-svg-core";
+import SubmissionStatus from "./SubmissonStatus";
 
 const MediaInput: React.FC = () => {
   // State variables
@@ -15,75 +11,65 @@ const MediaInput: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<string[] | null>(null);
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
 
-  const navigate = useNavigate();
-
   /**
    * Handles the form submission event.
-   * POST to "http://localhost:8080/fhir/Patient"
+   * POST to "http://localhost:8080/fhir/Media"
    * @param e - The form submission event.
    */
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log(selectedFiles);
-
     e.preventDefault();
-    // Create a new identifier for the patient
+
+    // Create a new identifier for the Media
     const newIdentifier = new fhirR4.Identifier();
     newIdentifier.value = (
       e.currentTarget.elements.namedItem("identifier") as HTMLInputElement
     ).value;
 
-    //define the status of the observation
+    //define the status of the Media
     let statusValue = (
         e.currentTarget.elements.namedItem("status") as HTMLInputElement
     ).value;
-
     const newStatus : fhirR4.Code =
-    statusValue === "preparation" ||
-    statusValue === "in-progress" ||
-    statusValue === "not-done" ||
-    statusValue === "on-hold" ||
-    statusValue === "stopped" ||
-    statusValue === "completed" ||
-    statusValue === "entered-in-error" ||
-    statusValue === "unknown"
-      ? statusValue
-      : "preliminary";
+          statusValue === "preparation" ||
+          statusValue === "in-progress" ||
+          statusValue === "not-done" ||
+          statusValue === "on-hold" ||
+          statusValue === "stopped" ||
+          statusValue === "completed" ||
+          statusValue === "entered-in-error" ||
+          statusValue === "unknown"
+            ? statusValue
+            : "preliminary";
 
+    //define the tyep of Media
     const typeOfMedia = new fhirR4.CodeableConcept();
-    //define the  
     const typeOfMediaCoding = new fhirR4.Coding(); 
     typeOfMediaCoding.system = "http://terminology.hl7.org/CodeSystem/media-type";
     typeOfMediaCoding.code = (e.currentTarget.elements.namedItem("typeOfMedia") as HTMLInputElement).value;
     typeOfMedia.coding = [typeOfMediaCoding];
 
+    //define the patient reference
     const newPatientReference = new fhirR4.Reference(); 
     newPatientReference.type = "Patient"; 
     newPatientReference.reference = 'Patient/' + patientId;
 
-    // Construct the birth date in the required format
+    //define the dateTime in the needed format
     const dateTime = (e.currentTarget.elements.namedItem("dateTime") as HTMLInputElement).value + ":00+02:00";
-
-    console.log(dateTime);
     
+    //define the bodySite
     const bodySite = new fhirR4.CodeableConcept(); 
     const bodySiteCoding = new fhirR4.Coding(); 
     bodySiteCoding.system = "http://hl7.org/fhir/ValueSet/body-site";
     bodySiteCoding.code = (e.currentTarget.elements.namedItem("bodySite") as HTMLInputElement).value;
     bodySite.coding = [bodySiteCoding];
 
+    //deifne the annotation
     const note = new fhirR4.Annotation(); 
     note.text = (e.currentTarget.elements.namedItem("note") as HTMLInputElement).value;
 
-
-    
     if (selectedFiles) {
 
-      const status_media_upload = new Array(selectedFiles.length).fill(false);
-
-
       for (let i = 0; i < selectedFiles.length; ++i) {
-
-        console.log(selectedFiles[i]);
 
         const file: string = selectedFiles[i];
 
@@ -118,16 +104,15 @@ const MediaInput: React.FC = () => {
           body: JSON.stringify(media),
         })
           .then((response) => {
-            console.log(response);
-            if (response.ok) {
-              setSubmissionStatus("success");
-            } else {
+            if (!response.ok) {
               setSubmissionStatus("failure");
             }
             response.json();
           })
           .then((data) => {
             // Handle the response from the API
+
+            //I THINK THIS IS NOT IMPORTANT? 
             console.log("Response from API:", data);
           })
           .catch((error) => {
@@ -135,16 +120,9 @@ const MediaInput: React.FC = () => {
             console.error("Error:", error);
             setSubmissionStatus("failure");
           });
-
-     }
-
-
-
+      }
+      setSubmissionStatus("success");
     }
-
-
-
-
 };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,12 +161,6 @@ const MediaInput: React.FC = () => {
     }
   };
   
-
-
-  const handleCloseNotification = () => {
-    setSubmissionStatus(null);
-  };
-
   return (
     <div>
       <div>
@@ -208,7 +180,7 @@ const MediaInput: React.FC = () => {
               type="text"
               name="identifier"
               required
-              defaultValue={patientId}
+              defaultValue={uuidv4()}
             />
           </label>
           <br />
@@ -302,41 +274,13 @@ const MediaInput: React.FC = () => {
             Submit
           </button>
         </div>
-        {submissionStatus && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-filter backdrop-blur-sm flex items-center justify-center">
-              <div className="max-w-md mx-auto">
-                <div className="bg-white shadow-lg rounded-lg p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <p className="text-lg font-semibold mr-2">
-                      {submissionStatus === "success"
-                        ? "Submission successful!"
-                        : "Submission failed. Please try again."}
-                    </p>
-                    <button
-                      className="text-gray-800 hover:text-gray-600"
-                      onClick={handleCloseNotification}
-                    >
-                      <FontAwesomeIcon
-                        icon={faTimes}
-                        className="h-5 w-5 text-gray-800 hover:text-red-400"
-                      />
-                    </button>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    Patient was successfully added to the Database.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-    </form>
-   
-    </div>
 
-    
-    
+        <SubmissionStatus 
+          submissionStatus={submissionStatus} 
+          submissionTextSucess={"Media was successfully added to the Database."} 
+          submissionTextFailure={"Media could not be successfully added to the Database."}></SubmissionStatus>
+      </form>
+    </div> 
   );
 };
 
