@@ -19,8 +19,10 @@ const PatientDetails = () => {
   const [media, setMedia] = useState<fhirR4.Media[]>([]);
   const [isEditMode, setIsEditMode] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [filterAttribute, setFilterAttribute] = useState("");
+  const [filterAttribute, setFilterAttribute] = useState("identifier");
   const [sortAttribute, setSortAttribute] = useState("");
+  const [mediaPerPage, setMediaPerPage] = useState(20);
+  const [offsetMediaPerPage, setoffsetMediaPerPage] = useState(0);
   const [editedPatient, setEditedPatient] = useState<fhirR4.Patient>(
     {} as fhirR4.Patient
   );
@@ -30,7 +32,7 @@ const PatientDetails = () => {
   useEffect(() => {
     fetchPatient();
     fetchMedia();
-}, [patientId]);
+}, [patientId, mediaPerPage, offsetMediaPerPage]);
 
   const fetchPatient = async () => {
     try {
@@ -48,7 +50,7 @@ const PatientDetails = () => {
   const fetchMedia = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8080/fhir/Media?subject=${patientId}`
+        `http://localhost:8080/fhir/Media?subject=${patientId}&_count=${mediaPerPage}&_offset=${offsetMediaPerPage}`
       );
       const data = await response.json();
       const patientsData = data.entry.map(
@@ -268,6 +270,20 @@ const PatientDetails = () => {
   
     );
   };
+
+
+  const handleMediaPerPageChange = (value: string) => {
+    const parsedValue = parseInt(value, 10);
+    setMediaPerPage(parsedValue);
+  };
+
+  const handleOffsetMediaPerPageChange = (value: number) => {
+    if (value < 0) {
+      value = 0;
+    }
+    console.log(value);
+    setoffsetMediaPerPage(value);
+  };
   
   return (
     <div>
@@ -297,6 +313,7 @@ const PatientDetails = () => {
       </div>
 
 
+<div>
       <div className="flex flex-wrap items-center mb-4 font-mono md:font-mono text-lg/5 md:text-lg/5 justify-center">
         <select
           className="rounded border-b-2 mr-2 font-mono md:font-mono text-lg/5 md:text-lg/5 mb-2 md:mb-0"
@@ -337,6 +354,42 @@ const PatientDetails = () => {
         >
           Refresh
         </button>
+        
+        </div>
+
+        <div className="flex flex-wrap items-center mb-4 font-mono md:font-mono text-lg/5 md:text-lg/5 justify-center">
+            <div className="ml-4">
+          <label htmlFor="numberSelect">Media per Page:</label>
+            <select id="numberSelect" onChange={(e) => handleMediaPerPageChange(e.target.value)} defaultValue={"20"}>
+              <option value="">Select a number</option>
+              <option value="20">20</option>
+              <option value="30">30</option>
+              <option value="40">40</option>
+              <option value="50">50</option>
+              
+              {/* Add more options if needed */}
+            </select>
+          </div>
+
+
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
+            onClick={() => handleOffsetMediaPerPageChange(offsetMediaPerPage - mediaPerPage)}
+          >
+            Prev {mediaPerPage} Media
+          </button>
+
+
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
+            onClick={() => handleOffsetMediaPerPageChange(offsetMediaPerPage + mediaPerPage)}
+          >
+            Next {mediaPerPage} Media
+          </button>
+
+   
+
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">

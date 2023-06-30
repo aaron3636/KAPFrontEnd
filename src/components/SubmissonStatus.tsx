@@ -6,10 +6,12 @@ import { faTimes } from "@fortawesome/free-solid-svg-icons";
 interface SubmissionStatusProps {
     submissionStatus: string | null;
     submissionTextSucess: string | null;
+    submissionHeadlineSucess: string | null;
     submissionTextFailure: string | null;
+    submissionHeadlineFailure: string | null;
 }
   
-const SubmissionStatus: React.FC<SubmissionStatusProps> = ({ submissionStatus, submissionTextSucess, submissionTextFailure }) => {
+const SubmissionStatus: React.FC<SubmissionStatusProps> = ({ submissionStatus, submissionTextSucess, submissionTextFailure, submissionHeadlineSucess, submissionHeadlineFailure }) => {
     const [status, setStatus] = useState<boolean>(true);
 
     useEffect(() => {
@@ -21,7 +23,7 @@ const SubmissionStatus: React.FC<SubmissionStatusProps> = ({ submissionStatus, s
     const handleCloseNotification = () => {
         setStatus(false);
     };
-
+    
     return (
         <div>
             {submissionStatus && status && (
@@ -31,7 +33,7 @@ const SubmissionStatus: React.FC<SubmissionStatusProps> = ({ submissionStatus, s
                         <div className="bg-white shadow-lg rounded-lg p-6">
                             <div className="flex justify-between items-center mb-4">
                                 <p className="text-lg font-semibold mr-2">
-                                    {submissionStatus === 'success' ? 'Submission successful!' : 'Submission failed. Please try again.'}
+                                    {submissionStatus === 'success' ? submissionHeadlineSucess : submissionHeadlineFailure }
                                 </p>
                                 <button className="text-gray-800 hover:text-gray-600" onClick={handleCloseNotification}>
                                     <FontAwesomeIcon

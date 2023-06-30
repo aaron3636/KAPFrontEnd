@@ -278,6 +278,8 @@ const MediaInput: React.FC = () => {
         <SubmissionStatus 
           submissionStatus={submissionStatus} 
           submissionTextSucess={"Media was successfully added to the Database."} 
+          submissionHeadlineSucess={"Submission successful!"}
+          submissionHeadlineFailure={"Submission failed. Please try again."}
           submissionTextFailure={"Media could not be successfully added to the Database."}></SubmissionStatus>
       </form>
     </div> 
