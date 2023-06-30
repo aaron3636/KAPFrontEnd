@@ -45,12 +45,7 @@ const PatientForm: React.FC = () => {
         ? genderValue
         : undefined;
     // Construct the birth date in the required format
-    const db =
-      (e.currentTarget.elements.namedItem("year") as HTMLInputElement).value +
-      "-" +
-      (e.currentTarget.elements.namedItem("month") as HTMLInputElement).value.toString().padStart(2, '0')+
-      "-" +
-      (e.currentTarget.elements.namedItem("day") as HTMLInputElement).value.toString().padStart(2, '0');
+    const db = (e.currentTarget.elements.namedItem("birthday") as HTMLInputElement).value;
     // Create a new contact point for email
     const newEmail = new fhirR4.ContactPoint();
     newEmail.system = "email";
@@ -257,31 +252,11 @@ const PatientForm: React.FC = () => {
 
         <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
           <label>
-            Birth Date:
+            Birthday:
             <input
               className="rounded border-b-2"
-              type="number"
-              name="day"
-              min="1"
-              max="31"
-              required
-            />
-            .
-            <input
-              className="rounded border-b-2"
-              type="number"
-              name="month"
-              min="1"
-              max="12"
-              required
-            />
-            .
-            <input
-              className="rounded border-b-2"
-              type="number"
-              name="year"
-              min="1900"
-              max="2023"
+              type="date"
+              name="birthday"
               required
             />
           </label>
@@ -412,6 +387,8 @@ const PatientForm: React.FC = () => {
         <SubmissionStatus 
           submissionStatus={submissionStatus} 
           submissionTextSucess={"Patient was successfully added to the Database."} 
+          submissionHeadlineSucess={"Submission successful!"}
+          submissionHeadlineFailure={"Submission failed. Please try again."}
           submissionTextFailure={"Patient could not be successfully added to the Database."}></SubmissionStatus>
           
       </form>

@@ -26,20 +26,46 @@ const MediaInput: React.FC = () => {
     ).value;
 
     //define the status of the Media
-    let statusValue = (
-        e.currentTarget.elements.namedItem("status") as HTMLInputElement
+    let statusValueMedia = (
+        e.currentTarget.elements.namedItem("statusMedia") as HTMLInputElement
     ).value;
-    const newStatus : fhirR4.Code =
-          statusValue === "preparation" ||
-          statusValue === "in-progress" ||
-          statusValue === "not-done" ||
-          statusValue === "on-hold" ||
-          statusValue === "stopped" ||
-          statusValue === "completed" ||
-          statusValue === "entered-in-error" ||
-          statusValue === "unknown"
-            ? statusValue
+    const statusMedia : fhirR4.Code =
+          statusValueMedia === "preparation" ||
+          statusValueMedia === "in-progress" ||
+          statusValueMedia === "not-done" ||
+          statusValueMedia === "on-hold" ||
+          statusValueMedia === "stopped" ||
+          statusValueMedia === "completed" ||
+          statusValueMedia === "entered-in-error" ||
+          statusValueMedia === "unknown"
+            ? statusValueMedia
             : "preliminary";
+
+
+    let statusValueObservation = (
+      e.currentTarget.elements.namedItem("statusObservation") as HTMLInputElement
+    ).value;
+    const statusObservation: fhirR4.Observation.StatusEnum | undefined =
+      statusValueObservation === "registered" ||
+      statusValueObservation === "preliminary" ||
+      statusValueObservation === "final"
+        ? statusValueObservation : "preliminary";
+
+
+    const observationCategory = new fhirR4.CodeableConcept();
+    //define the  
+    const newCategoryCoding = new fhirR4.Coding(); 
+    newCategoryCoding.system = "http://hl7.org/fhir/ValueSet/observation-category";
+    newCategoryCoding.code = (e.currentTarget.elements.namedItem("category") as HTMLInputElement).value;
+    observationCategory.coding = [newCategoryCoding];
+
+
+    const newObservationCoding = new fhirR4.CodeableConcept();
+    //define the Observation coding 
+    const newTypeOfObservationCoding = new fhirR4.Coding(); 
+    newTypeOfObservationCoding.system = "http://hl7.org/fhir/ValueSet/observation-codes";
+    newTypeOfObservationCoding.code = (e.currentTarget.elements.namedItem("loinc_code") as HTMLInputElement).value;
+    newObservationCoding.coding = [newTypeOfObservationCoding];
 
     //define the tyep of Media
     const typeOfMedia = new fhirR4.CodeableConcept();
@@ -67,7 +93,12 @@ const MediaInput: React.FC = () => {
     const note = new fhirR4.Annotation(); 
     note.text = (e.currentTarget.elements.namedItem("note") as HTMLInputElement).value;
 
+
+
+
     if (selectedFiles) {
+
+      const derivedFrom : fhirR4.Reference[] = []; 
 
       for (let i = 0; i < selectedFiles.length; ++i) {
 
@@ -84,9 +115,23 @@ const MediaInput: React.FC = () => {
           id: uuidv4(), // Generate a unique ID for the attachment
         };
 
+        const mediaIdentifier = new fhirR4.Identifier();
+        mediaIdentifier.value = uuidv4();
+
+        //references the Media: Observation -> Media
+        const referenceMedia = new fhirR4.Reference(); 
+        referenceMedia.type = "Media";
+        referenceMedia.identifier = mediaIdentifier;
+
+        //references the Oberservation: Media -> Observation
+        const referenceObservation = new fhirR4.Reference(); 
+        referenceObservation.type = "Observation";
+        referenceObservation.identifier = newIdentifier;
+
         const media : fhirR4.Media = {
-          identifier: [newIdentifier], 
-          status: newStatus, 
+          identifier: [mediaIdentifier], 
+          partOf: [referenceObservation],
+          status: statusMedia, 
           type: typeOfMedia, 
           subject: newPatientReference, 
           createdDateTime: dateTime, 
@@ -95,33 +140,78 @@ const MediaInput: React.FC = () => {
           note: [note], 
           resourceType: "Media"
         };
-    
-        fetch("http://localhost:8080/fhir/Media", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(media),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              setSubmissionStatus("failure");
-            }
-            response.json();
-          })
-          .then((data) => {
-            // Handle the response from the API
 
-            //I THINK THIS IS NOT IMPORTANT? 
-            console.log("Response from API:", data);
-          })
-          .catch((error) => {
-            // Handle any errors that occur during the request
-            console.error("Error:", error);
+        derivedFrom.push(referenceMedia);
+
+        console.log(JSON.stringify(media));
+        fetch("http://localhost:8080/fhir/Media", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(media),
+        })
+        .then((response) => {
+          if (!response.ok) {
             setSubmissionStatus("failure");
-          });
+          } 
+          response.json();
+        })
+        .then((data) => {
+          // Handle the response from the API
+
+          //I THINK THIS IS NOT IMPORTANT? 
+          console.log("Response from API:", data);
+        })
+        .catch((error) => {
+          // Handle any errors that occur during the request
+          console.error("Error:", error);
+          setSubmissionStatus("failure");
+        });
+
       }
-      setSubmissionStatus("success");
+
+      console.log(derivedFrom);
+      
+
+      const observation: fhirR4.Observation = {
+        identifier: [newIdentifier], 
+        status: statusObservation, 
+        category: [observationCategory],
+        code: newObservationCoding,
+        effectiveDateTime: dateTime,
+        derivedFrom: derivedFrom,
+        subject: newPatientReference,
+        resourceType: "Observation"
+      };
+
+      console.log(JSON.stringify(observation));
+      fetch("http://localhost:8080/fhir/Observation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(observation),
+      })
+        .then((response) => {
+          if (response.ok) {
+            setSubmissionStatus("success");
+          } else {
+            setSubmissionStatus("failure");
+          }
+          response.json();
+        })
+        .then((data) => {
+          // Handle the response from the API
+
+          //I THINK THIS IS NOT IMPORTANT? 
+          console.log("Response from API:", data);
+        })
+        .catch((error) => {
+          // Handle any errors that occur during the request
+          console.error("Error:", error);
+          setSubmissionStatus("failure");
+        });
     }
 };
 
@@ -188,8 +278,8 @@ const MediaInput: React.FC = () => {
 
         <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
           <label>
-            Status:
-            <select className="text-sm" name="status" defaultValue="" required>
+            Status Media:
+            <select className="text-sm" name="statusMedia" defaultValue="" required>
               <option value="" disabled>
                 Select Status
               </option>
@@ -202,6 +292,56 @@ const MediaInput: React.FC = () => {
               <option value="entered-in-error">entered-in-error</option>
               <option value="unknown">unknown</option>
             </select>
+          </label>
+          <br />
+        </div>
+
+        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
+          <label>
+            Status Observation:
+            <select className="text-sm" name="statusObservation" defaultValue="" required>
+              <option value="" disabled>
+                Select Status
+              </option>
+              <option value="registered">registered</option>
+              <option value="preliminary">preliminary</option>
+              <option value="final">final</option>
+            </select>
+          </label>
+          <br />
+        </div>
+
+
+        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
+          <label>
+            Observation Category
+            <select className="text-sm" name="category" defaultValue="" required>
+              <option value="" disabled>
+                Select category
+              </option>
+              <option value="vital-signs">vital-signs</option>
+              <option value="imaging">imaging</option>
+              <option value="labratory">labratory</option>
+              <option value="procedure">procedure</option>
+              <option value="survey">survey</option>
+              <option value="exam">exam</option>
+              <option value="therapy">therapy</option>
+              <option value="activity">activity</option>
+            </select>
+          </label>
+          <br />
+        </div>
+
+
+        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
+          <label>
+            Observation LOINC Code:
+            <input
+              className="rounded border-b-2"
+              type="text"
+              name="loinc_code"
+              required
+            />
           </label>
           <br />
         </div>

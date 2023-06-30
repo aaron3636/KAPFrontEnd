@@ -193,31 +193,31 @@ export const generatePatientAddress = (patient: fhirR4.Patient) => {
   return "No address available";
 };
 
-export const filterMedia = (
-  images: fhirR4.Media[],
+export const filterObservation = (
+  observations: fhirR4.Observation[],
   filterAttribute: string,
   searchText: string
 ) => {
-  const filteredMedia = images.filter((image) => {
+  const filteredMedia = observations.filter((observation) => {
     if (filterAttribute === "identifier") {
-      return image.identifier?.[0]?.value
+      return observation.identifier?.[0]?.value
         ?.toLowerCase()
         .includes(searchText.toLowerCase());
     } else if (filterAttribute === "status") {
-      return image.status
+      return observation.status
         ?.toLowerCase()
         .includes(searchText.toLowerCase());
-    } else if (filterAttribute === "type") {
-      return image.type?.coding?.[0]?.code
+    } else if (filterAttribute === "code") {
+      return observation.code?.coding?.[0]?.code
         ?.toLowerCase()
         .includes(searchText.toLowerCase());
     } else if (filterAttribute === "dateTime") {
-      return image.createdDateTime
+      return observation.effectiveDateTime
         ?.toString()
         .toLowerCase()
         .includes(searchText.toLowerCase());
     } else if (filterAttribute === "bodySite") {
-      return image.bodySite?.coding?.[0]?.code
+      return observation.bodySite?.coding?.[0]?.code
         ?.toString()
         .toLowerCase()
         .includes(searchText.toLowerCase());
@@ -229,8 +229,8 @@ export const filterMedia = (
 };
 
 
-export const sortMedia = (
-  images: fhirR4.Media[],
+export const sortObservation = (
+  observations: fhirR4.Observation[],
   sortAttribute: string
 ) => {
   /**
@@ -238,28 +238,28 @@ export const sortMedia = (
    * @param observation or Media - The patient object.
    * @returns The value of the attribute or undefined if not found.
    */
-  const getValue = (image: fhirR4.Media) => {
+  const getValue = (observation: fhirR4.Observation) => {
     switch (sortAttribute) {
       case "identifier":
-        return image.identifier?.[0].value;
+        return observation.identifier?.[0].value;
       case "status":
-        return image.status;
-      case "type":
-        return image.type?.coding?.[0]?.code;
+        return observation.status;
+      case "code":
+        return observation.code?.coding?.[0]?.code;
       case "dateTime":
-        return image.createdDateTime;
+        return observation.effectiveDateTime;
       case "bodySite":
-        return image.bodySite?.coding?.[0]?.code;     
+        return observation.bodySite?.coding?.[0]?.code;     
       // Add cases for other attributes you want to sort by
       default:
         return undefined;
     }
   };
 
-  return images.sort(
-    (imageOne: fhirR4.Media, imageTwo: fhirR4.Media) => {
-      const imageOneValue = getValue(imageOne);
-      const imageTwoValue = getValue(imageTwo);
+  return observations.sort(
+    (observationOne: fhirR4.Observation, observationTwo: fhirR4.Observation) => {
+      const imageOneValue = getValue(observationOne);
+      const imageTwoValue = getValue(observationTwo);
 
       if (imageOneValue === undefined || imageTwoValue === undefined) {
         return 0;

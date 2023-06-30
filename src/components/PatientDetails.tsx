@@ -9,14 +9,14 @@ import { useNavigate } from "react-router-dom";
 import EditPatientForm from "./EditPatientForm";
 import BundleEntry from "./BundleEntry";
 import {
-  filterMedia,
-  sortMedia,
+  filterObservation,
+  sortObservation,
 } from "./utils";
 
 const PatientDetails = () => {
   const { patientId } = useParams();
   const [patient, setPatient] = useState<fhirR4.Patient | null>(null);
-  const [media, setMedia] = useState<fhirR4.Media[]>([]);
+  const [media, setMedia] = useState<fhirR4.Observation[]>([]);
   const [isEditMode, setIsEditMode] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [filterAttribute, setFilterAttribute] = useState("identifier");
@@ -31,7 +31,7 @@ const PatientDetails = () => {
 
   useEffect(() => {
     fetchPatient();
-    fetchMedia();
+    fetchObservation();
 }, [patientId, mediaPerPage, offsetMediaPerPage]);
 
   const fetchPatient = async () => {
@@ -47,10 +47,10 @@ const PatientDetails = () => {
     }
   };
 
-  const fetchMedia = async () => {
+  const fetchObservation = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8080/fhir/Media?subject=${patientId}&_count=${mediaPerPage}&_offset=${offsetMediaPerPage}`
+        `http://localhost:8080/fhir/Observation?subject=${patientId}&_count=${mediaPerPage}&_offset=${offsetMediaPerPage}`
       );
       const data = await response.json();
       const patientsData = data.entry.map(
@@ -137,13 +137,13 @@ const PatientDetails = () => {
 
   }
 
-  const filterAndSortMedia = () => {
-    const filteredPatients = filterMedia(
+  const filterAndSortObservation = () => {
+    const filteredPatients = filterObservation(
       media,
       filterAttribute,
       searchText
     );
-    const sortedPatients = sortMedia(filteredPatients, sortAttribute);
+    const sortedPatients = sortObservation(filteredPatients, sortAttribute);
     return sortedPatients;
   };
 
@@ -165,7 +165,7 @@ const PatientDetails = () => {
 
   // Refresh the patient data by fetching patients again
   const handleRefresh = () => {
-    fetchMedia(); // Fetch patients again to refresh the data
+    fetchObservation(); // Fetch patients again to refresh the data
   };
 
 
@@ -272,12 +272,12 @@ const PatientDetails = () => {
   };
 
 
-  const handleMediaPerPageChange = (value: string) => {
+  const handleObservationPerPageChange = (value: string) => {
     const parsedValue = parseInt(value, 10);
     setMediaPerPage(parsedValue);
   };
 
-  const handleOffsetMediaPerPageChange = (value: number) => {
+  const handleOffsetObervationPerPageChange = (value: number) => {
     if (value < 0) {
       value = 0;
     }
@@ -308,7 +308,7 @@ const PatientDetails = () => {
         <button 
           onClick={() => handleClick(patient?.id)}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 m-4 rounded text-lg ">
-            Add Media
+            Add Observation
         </button>
       </div>
 
@@ -359,8 +359,8 @@ const PatientDetails = () => {
 
         <div className="flex flex-wrap items-center mb-4 font-mono md:font-mono text-lg/5 md:text-lg/5 justify-center">
             <div className="ml-4">
-          <label htmlFor="numberSelect">Media per Page:</label>
-            <select id="numberSelect" onChange={(e) => handleMediaPerPageChange(e.target.value)} defaultValue={"20"}>
+          <label htmlFor="numberSelect">Observation per Page:</label>
+            <select id="numberSelect" onChange={(e) => handleObservationPerPageChange(e.target.value)} defaultValue={"20"}>
               <option value="">Select a number</option>
               <option value="20">20</option>
               <option value="30">30</option>
@@ -374,17 +374,17 @@ const PatientDetails = () => {
 
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-            onClick={() => handleOffsetMediaPerPageChange(offsetMediaPerPage - mediaPerPage)}
+            onClick={() => handleOffsetObervationPerPageChange(offsetMediaPerPage - mediaPerPage)}
           >
-            Prev {mediaPerPage} Media
+            Prev {mediaPerPage} Observation
           </button>
 
 
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-            onClick={() => handleOffsetMediaPerPageChange(offsetMediaPerPage + mediaPerPage)}
+            onClick={() => handleOffsetObervationPerPageChange(offsetMediaPerPage + mediaPerPage)}
           >
-            Next {mediaPerPage} Media
+            Next {mediaPerPage} Observation
           </button>
 
    
@@ -413,53 +413,35 @@ const PatientDetails = () => {
               <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
                 Note
               </th>
-              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                Content
-              </th>
             </tr>
           </thead>
           <tbody>
-            {filterAndSortMedia().map((image) => (
+            {filterAndSortObservation().map((observation) => (
               <tr
-                key={image.id}
+                key={observation.id}
                 className="cursor-pointer hover:bg-gray-100"
               >
                 <td className="p-4 font-mono md:font-mono text-lg/2 md:text-lg/2 whitespace-nowrap">
-                  {image.identifier?.[0]?.value === undefined ? (
+                  {observation.identifier?.[0]?.value === undefined ? (
                     <div className="flex items-center justify-center h-full">
                       Nun
                     </div>
                   ) : (
-                    image.identifier?.[0]?.value
+                    observation.identifier?.[0]?.value
                   )}
                 </td>
                 <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                  {image.status}
+                  {observation.status}
                 </td>
                 <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                  {image.type?.coding?.[0]?.code}
+                  {observation.category?.[0]?.coding?.[0]?.code}
                 </td>
                 <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                  {image.createdDateTime}
-                </td>
-                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                  {image.bodySite?.coding?.[0]?.code}
+                  {observation.effectiveDateTime}
                 </td>
                 <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 whitespace-nowrap">
-                  {image.note?.[0]?.text}
+                  {observation.note?.[0]?.text}
                 </td>
-               { <td className="p-4 flex justify-center font-mono md:font-mono text-lg/5 md:text-lg/5 h-auto max-w-sm hover:shadow-lg dark:shadow-black/30">
-                      <div
-                        key={image.id}
-                        className="w-20 h-20 bg-gray-400 rounded-lg overflow-hidden mx-1 my-1 cursor-pointer"
-                        >
-                      <img
-                        src={`data:${image.content.contentType};base64,${image.content.data}`}
-                        alt="Patient Attachment"
-                        className="object-cover w-full h-full"
-                      />
-                    </div>
-                  </td>}
               </tr>
             ))}
           </tbody>
