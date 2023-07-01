@@ -1,5 +1,7 @@
 import { fhirR4 } from "@smile-cdr/fhirts";
 import { useState } from "react";
+import { faArrowAltCircleLeft, faArrowAltCircleRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export const filterPatients = (
   patients: fhirR4.Patient[],
@@ -123,6 +125,99 @@ const RenderPatientPhotos = ({ patient }: { patient: fhirR4.Patient }) => {
           />
         </div>
       )}
+    </div>
+  );
+};
+
+
+/**
+ * Renders the patient photos and provides an interactive display.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {fhirR4.Patient} props.patient - The patient object containing photo information.
+ * @returns {JSX.Element} - The rendered component.
+ */
+
+const RenderObservationPhoto = ({ media }: { media: fhirR4.Media }) => {
+  const [selectedPhoto, setSelectedPhoto] = useState<fhirR4.Attachment | null>(
+    null
+  );
+
+  const handlePhotoClick = (photo: fhirR4.Attachment) => {
+    setSelectedPhoto(photo);
+  };
+
+  return (
+    <div className="flex flex-wrap">
+      
+        <div
+          key={media.id}
+          className="w-50 h-50 bg-gray-400 rounded-lg overflow-hidden mx-1 my-1 cursor-pointer"
+          onClick={() => handlePhotoClick(media.content)}
+        >
+          <img
+            src={getCachedPhotoUrl(media.content)}
+            alt="Patient Attachment"
+            className="object-cover w-full h-full"
+          />
+        </div>
+    
+      {selectedPhoto && (
+        <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
+        onClick={() => setSelectedPhoto(null)}>
+          <img
+            src={getCachedPhotoUrl(selectedPhoto)}
+            alt="Latest observation"
+            className="max-w-full max-h-full"
+          />
+          
+        </div>
+      )}
+    </div>
+  );
+};
+
+/**
+ * Renders the patient photos.
+ *
+ * @param {fhirR4.Patient} patient - The patient object containing photo information.
+ * @returns {JSX.Element | string} - JSX element representing the patient photos or a string indicating no attachment available.
+ */
+export const RenderObservationPhotos = ({ media }: { media: fhirR4.Media[] }) => {
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number>(0);
+
+  const handlePreviousClick = () => {
+    setSelectedPhotoIndex((prevIndex) =>
+      prevIndex === 0 ? media.length - 1 : prevIndex - 1
+    );
+  };
+
+  const handleNextClick = () => {
+    setSelectedPhotoIndex((prevIndex) =>
+      prevIndex === media.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  console.log(media);
+  if (!media || media.length === 0) {
+    return <div>No attachment available</div>;
+  }
+  return (
+    <div>
+      <RenderObservationPhoto media={media[selectedPhotoIndex]} />
+      <div className="flex justify-between w-full">
+        <button
+          onClick={handlePreviousClick}
+        >
+          <FontAwesomeIcon icon={faArrowAltCircleLeft} className="text-4xl bg-blue-500 rounded-full text-white"/>
+        </button>
+        <button   
+          onClick={handleNextClick}
+        >
+          <FontAwesomeIcon icon={faArrowAltCircleRight} className="text-4xl bg-blue-500 rounded-full text-white"/>
+        </button>
+      </div>
     </div>
   );
 };

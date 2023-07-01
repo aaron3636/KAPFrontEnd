@@ -5,7 +5,8 @@ import PatientForm from "./components/PatientInput";
 import PatientList from "./components/ViewPatients";
 import Welcome from "./components/Welcome";
 import PatientDetails from "./components/PatientDetails";
-import MediaInput from "./components/MediaInput";
+import ObservationInput from "./components/ObservationInput";
+import ObservationDetails from "./components/ObservationDetails";
 
 function App() {
   return (
@@ -16,7 +17,8 @@ function App() {
           <Route path="/patient" element={<PatientList />} />
           <Route path="/add" element={<PatientForm />} />
           <Route path="/patient/:patientId" element={<PatientDetails />} />
-          <Route path="/AddMedia/:patientId" element={<MediaInput />} />
+          <Route path="/addObservation/:patientId" element={<ObservationInput />} />
+          <Route path="/observation/:observationId" element={<ObservationDetails />} />
         </Routes>
       </div>
     </Router>

@@ -14,7 +14,7 @@ import {
 } from "./utils";
 
 const PatientDetails = () => {
-  const { patientId } = useParams();
+  const {patientId} = useParams();
   const [patient, setPatient] = useState<fhirR4.Patient | null>(null);
   const [media, setMedia] = useState<fhirR4.Observation[]>([]);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -32,7 +32,7 @@ const PatientDetails = () => {
   useEffect(() => {
     fetchPatient();
     fetchObservation();
-}, [patientId, mediaPerPage, offsetMediaPerPage]);
+  }, [patientId, mediaPerPage, offsetMediaPerPage]);
 
   const fetchPatient = async () => {
     try {
@@ -132,7 +132,7 @@ const PatientDetails = () => {
     
     if (patientId) {
       // Navigate to the patient detail page with the patientId as a parameter
-      navigate(`/AddMedia/${patientId}`);
+      navigate(`/addObservation/${patientId}`);
     }
 
   }
@@ -284,6 +284,15 @@ const PatientDetails = () => {
     console.log(value);
     setoffsetMediaPerPage(value);
   };
+
+  // Navigate to the patient detail page with the patientId as a parameter
+  const handleRowClick = (observationId: string | undefined) => {
+    if (observationId) {
+      // Navigate to the patient detail page with the patientId as a parameter
+      navigate(`/observation/${observationId}`);
+    }
+  };
+
   
   return (
     <div>
@@ -420,6 +429,7 @@ const PatientDetails = () => {
               <tr
                 key={observation.id}
                 className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleRowClick(observation.id)}
               >
                 <td className="p-4 font-mono md:font-mono text-lg/2 md:text-lg/2 whitespace-nowrap">
                   {observation.identifier?.[0]?.value === undefined ? (

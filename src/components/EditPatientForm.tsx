@@ -52,7 +52,7 @@ const EditPatientForm: React.FC<EditPatientFormProps> = ({
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Edit Patient</h2>
-      <form onSubmit={handleSubmit}>
+      <form onClick={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="givenName" className="text-lg font-medium">
             Given Name:
@@ -97,6 +97,7 @@ const EditPatientForm: React.FC<EditPatientFormProps> = ({
           <button
             type="submit"
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
+            
           >
             Save
           </button>
