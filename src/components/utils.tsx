@@ -1,79 +1,110 @@
 import { fhirR4 } from "@smile-cdr/fhirts";
 import { useState } from "react";
-import { faArrowAltCircleLeft, faArrowAltCircleRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowAltCircleLeft,
+  faArrowAltCircleRight,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export const filterPatients = (
-  patients: fhirR4.Patient[],
+/**
+ * Filters an array of resources based on the specified filter attribute and search text.
+ *
+ * @param resources - The array of resources to be filtered.
+ * @param filterAttribute - The attribute to filter by.
+ * @param searchText - The text to search for.
+ * @returns The filtered array of resources.
+ */
+export function filterResources<T>(
+  resources: T[],
   filterAttribute: string,
   searchText: string
-) => {
-  const filteredPatients = patients.filter((patient) => {
-    if (filterAttribute === "name") {
-      return patient.name?.[0]?.given?.[0]
+): T[] {
+  const filteredResources = resources.filter((resource: any) => {
+    if (filterAttribute === "identifier") {
+      return resource.identifier?.[0]?.value
+        ?.toString()
+        .toLowerCase()
+        .includes(searchText.toLowerCase());
+    } else if (filterAttribute === "status") {
+      return resource.status?.toLowerCase().includes(searchText.toLowerCase());
+    } else if (filterAttribute === "code") {
+      return resource.code?.coding?.[0]?.code
+        ?.toLowerCase()
+        .includes(searchText.toLowerCase());
+    } else if (filterAttribute === "dateTime") {
+      return resource.effectiveDateTime
+        ?.toString()
+        .toLowerCase()
+        .includes(searchText.toLowerCase());
+    } else if (filterAttribute === "bodySite") {
+      return resource.bodySite?.coding?.[0]?.code
+        ?.toString()
+        .toLowerCase()
+        .includes(searchText.toLowerCase());
+    } else if (filterAttribute === "name") {
+      return resource.name?.[0]?.given?.[0]
         .toLowerCase()
         .includes(searchText.toLowerCase());
     } else if (filterAttribute === "family") {
-      return patient.name?.[0].family
+      return resource.name?.[0].family
         ?.toLowerCase()
         .includes(searchText.toLowerCase());
     } else if (filterAttribute === "birthDate") {
-      return patient.birthDate
+      return resource.birthDate
         ?.toLowerCase()
-        .includes(searchText.toLowerCase());
-    } else if (filterAttribute === "identifier") {
-      return patient.identifier?.[0].value
-        ?.toString()
-        .toLowerCase()
         .includes(searchText.toLowerCase());
     } else {
       return null;
     }
   });
-  return filteredPatients;
-};
+
+  return filteredResources;
+}
 
 /**
- * Sorts an array of patients based on the specified sort attribute.
- * @param patients - The array of patients to be sorted.
- * @param sortAttribute - The attribute to sort the patients by ("name", "birthDate", "family", etc.).
- * @returns The sorted array of patients.
+ * Sorts an array of resources based on the specified sort attribute.
+ *
+ * @param resources - The array of resources to be sorted.
+ * @param sortAttribute - The attribute to sort by.
+ * @returns The sorted array of resources.
  */
-export const sortPatients = (
-  patients: fhirR4.Patient[],
+export const sortResources = <T extends { [key: string]: any }>(
+  resources: T[],
   sortAttribute: string
 ) => {
-  /**
-   * Gets the value of the specified attribute for a given patient.
-   * @param patient - The patient object.
-   * @returns The value of the attribute or undefined if not found.
-   */
-  const getValue = (patient: fhirR4.Patient) => {
+  const getValue = (resource: T) => {
     switch (sortAttribute) {
+      case "identifier":
+        return resource.identifier?.[0]?.value;
+      case "status":
+        return resource.status;
+      case "code":
+        return resource.code?.coding?.[0]?.code;
+      case "dateTime":
+        return resource.effectiveDateTime;
+      case "bodySite":
+        return resource.bodySite?.coding?.[0]?.code;
       case "name":
-        return patient.name?.[0]?.given?.[0];
-      case "birthDate":
-        return patient.birthDate;
+        return resource.name?.[0]?.given?.[0];
       case "family":
-        return patient.name?.[0]?.family;
-      // Add cases for other attributes you want to sort by
+        return resource.name?.[0]?.family;
+      case "birthDate":
+        return resource.birthDate;
       default:
         return undefined;
     }
   };
 
-  return patients.sort(
-    (patientOne: fhirR4.Patient, patientTwo: fhirR4.Patient) => {
-      const patientOneValue = getValue(patientOne);
-      const patientTwoValue = getValue(patientTwo);
+  return resources.sort((resourceOne: T, resourceTwo: T) => {
+    const valueOne = getValue(resourceOne);
+    const valueTwo = getValue(resourceTwo);
 
-      if (patientOneValue === undefined || patientTwoValue === undefined) {
-        return 0;
-      }
-
-      return patientOneValue.localeCompare(patientTwoValue);
+    if (valueOne === undefined || valueTwo === undefined) {
+      return 0;
     }
-  );
+
+    return valueOne.localeCompare(valueTwo);
+  });
 };
 
 /**
@@ -129,7 +160,6 @@ const RenderPatientPhotos = ({ patient }: { patient: fhirR4.Patient }) => {
   );
 };
 
-
 /**
  * Renders the patient photos and provides an interactive display.
  *
@@ -150,28 +180,28 @@ const RenderObservationPhoto = ({ media }: { media: fhirR4.Media }) => {
 
   return (
     <div className="flex flex-wrap">
-      
-        <div
-          key={media.id}
-          className="w-50 h-50 bg-gray-400 rounded-lg overflow-hidden mx-1 my-1 cursor-pointer"
-          onClick={() => handlePhotoClick(media.content)}
-        >
-          <img
-            src={getCachedPhotoUrl(media.content)}
-            alt="Patient Attachment"
-            className="object-cover w-full h-full"
-          />
-        </div>
-    
+      <div
+        key={media.id}
+        className="w-50 h-50 bg-gray-400 rounded-lg overflow-hidden mx-1 my-1 cursor-pointer"
+        onClick={() => handlePhotoClick(media.content)}
+      >
+        <img
+          src={getCachedPhotoUrl(media.content)}
+          alt="Patient Attachment"
+          className="object-cover w-full h-full"
+        />
+      </div>
+
       {selectedPhoto && (
-        <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
-        onClick={() => setSelectedPhoto(null)}>
+        <div
+          className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
+          onClick={() => setSelectedPhoto(null)}
+        >
           <img
             src={getCachedPhotoUrl(selectedPhoto)}
             alt="Latest observation"
             className="max-w-full max-h-full"
           />
-          
         </div>
       )}
     </div>
@@ -184,7 +214,11 @@ const RenderObservationPhoto = ({ media }: { media: fhirR4.Media }) => {
  * @param {fhirR4.Patient} patient - The patient object containing photo information.
  * @returns {JSX.Element | string} - JSX element representing the patient photos or a string indicating no attachment available.
  */
-export const RenderObservationPhotos = ({ media }: { media: fhirR4.Media[] }) => {
+export const RenderObservationPhotos = ({
+  media,
+}: {
+  media: fhirR4.Media[];
+}) => {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number>(0);
 
   const handlePreviousClick = () => {
@@ -207,15 +241,17 @@ export const RenderObservationPhotos = ({ media }: { media: fhirR4.Media[] }) =>
     <div>
       <RenderObservationPhoto media={media[selectedPhotoIndex]} />
       <div className="flex justify-between w-full">
-        <button
-          onClick={handlePreviousClick}
-        >
-          <FontAwesomeIcon icon={faArrowAltCircleLeft} className="text-4xl bg-blue-500 rounded-full text-white"/>
+        <button onClick={handlePreviousClick}>
+          <FontAwesomeIcon
+            icon={faArrowAltCircleLeft}
+            className="text-4xl bg-blue-500 rounded-full text-white"
+          />
         </button>
-        <button   
-          onClick={handleNextClick}
-        >
-          <FontAwesomeIcon icon={faArrowAltCircleRight} className="text-4xl bg-blue-500 rounded-full text-white"/>
+        <button onClick={handleNextClick}>
+          <FontAwesomeIcon
+            icon={faArrowAltCircleRight}
+            className="text-4xl bg-blue-500 rounded-full text-white"
+          />
         </button>
       </div>
     </div>
@@ -257,8 +293,6 @@ const getCachedPhotoUrl = (photo: fhirR4.Attachment) => {
   }
 };
 
-
-
 /**
  * Generates the patient address element based on the address data.
  *
@@ -288,6 +322,67 @@ export const generatePatientAddress = (patient: fhirR4.Patient) => {
   return "No address available";
 };
 
+/*
+ * POST
+ */
+
+export const post = async (url: string, data: any) => {
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      return await response.json();
+    } else {
+      throw new Error("Request failed");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
+/**
+ * @deprecated Use `filterResources` instead.
+ */
+export const filterPatients = (
+  patients: fhirR4.Patient[],
+  filterAttribute: string,
+  searchText: string
+) => {
+  const filteredPatients = patients.filter((patient) => {
+    if (filterAttribute === "name") {
+      return patient.name?.[0]?.given?.[0]
+        .toLowerCase()
+        .includes(searchText.toLowerCase());
+    } else if (filterAttribute === "family") {
+      return patient.name?.[0].family
+        ?.toLowerCase()
+        .includes(searchText.toLowerCase());
+    } else if (filterAttribute === "birthDate") {
+      return patient.birthDate
+        ?.toLowerCase()
+        .includes(searchText.toLowerCase());
+    } else if (filterAttribute === "identifier") {
+      return patient.identifier?.[0].value
+        ?.toString()
+        .toLowerCase()
+        .includes(searchText.toLowerCase());
+    } else {
+      return null;
+    }
+  });
+  return filteredPatients;
+};
+
+/**
+ * @deprecated Use `filterResources` instead.
+ */
 export const filterObservation = (
   observations: fhirR4.Observation[],
   filterAttribute: string,
@@ -323,16 +418,13 @@ export const filterObservation = (
   return filteredMedia;
 };
 
-
+/**
+ * @deprecated Use `sortResources` instead.
+ */
 export const sortObservation = (
   observations: fhirR4.Observation[],
   sortAttribute: string
 ) => {
-  /**
-   * Gets the value of the specified attribute for a given observation or Media.
-   * @param observation or Media - The patient object.
-   * @returns The value of the attribute or undefined if not found.
-   */
   const getValue = (observation: fhirR4.Observation) => {
     switch (sortAttribute) {
       case "identifier":
@@ -344,7 +436,7 @@ export const sortObservation = (
       case "dateTime":
         return observation.effectiveDateTime;
       case "bodySite":
-        return observation.bodySite?.coding?.[0]?.code;     
+        return observation.bodySite?.coding?.[0]?.code;
       // Add cases for other attributes you want to sort by
       default:
         return undefined;
@@ -352,7 +444,10 @@ export const sortObservation = (
   };
 
   return observations.sort(
-    (observationOne: fhirR4.Observation, observationTwo: fhirR4.Observation) => {
+    (
+      observationOne: fhirR4.Observation,
+      observationTwo: fhirR4.Observation
+    ) => {
       const imageOneValue = getValue(observationOne);
       const imageTwoValue = getValue(observationTwo);
 
@@ -361,6 +456,46 @@ export const sortObservation = (
       }
 
       return imageOneValue.localeCompare(imageTwoValue);
+    }
+  );
+};
+
+/**
+ * @deprecated Use `sortResources` instead.
+ */
+export const sortPatients = (
+  patients: fhirR4.Patient[],
+  sortAttribute: string
+) => {
+  /**
+   * Gets the value of the specified attribute for a given patient.
+   * @param patient - The patient object.
+   * @returns The value of the attribute or undefined if not found.
+   */
+  const getValue = (patient: fhirR4.Patient) => {
+    switch (sortAttribute) {
+      case "name":
+        return patient.name?.[0]?.given?.[0];
+      case "birthDate":
+        return patient.birthDate;
+      case "family":
+        return patient.name?.[0]?.family;
+      // Add cases for other attributes you want to sort by
+      default:
+        return undefined;
+    }
+  };
+
+  return patients.sort(
+    (patientOne: fhirR4.Patient, patientTwo: fhirR4.Patient) => {
+      const patientOneValue = getValue(patientOne);
+      const patientTwoValue = getValue(patientTwo);
+
+      if (patientOneValue === undefined || patientTwoValue === undefined) {
+        return 0;
+      }
+
+      return patientOneValue.localeCompare(patientTwoValue);
     }
   );
 };

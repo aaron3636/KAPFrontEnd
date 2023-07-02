@@ -18,11 +18,7 @@ function Welcome() {
           <span className="welcome-screen-option-icon">➕</span>
           <span className="welcome-screen-option-text">Add a New Patient</span>
         </Link>
-        {/* TODO: EDIT Patients */}
-        <Link to="/edit" className="welcome-screen-option edit">
-          <span className="welcome-screen-option-icon">✏️</span>
-          <span className="welcome-screen-option-text">Edit a Patient</span>
-        </Link>
+        {/* Add other Links if needed */}
       </div>
     </div>
   );

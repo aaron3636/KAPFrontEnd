@@ -8,13 +8,10 @@ import { faEdit, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import EditPatientForm from "./EditPatientForm";
 import BundleEntry from "./BundleEntry";
-import {
-  filterObservation,
-  sortObservation,
-} from "./utils";
+import { filterObservation, sortObservation } from "./utils";
 
 const PatientDetails = () => {
-  const {patientId} = useParams();
+  const { patientId } = useParams();
   const [patient, setPatient] = useState<fhirR4.Patient | null>(null);
   const [media, setMedia] = useState<fhirR4.Observation[]>([]);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -127,15 +124,12 @@ const PatientDetails = () => {
     }
   };
 
-
   const handleClick = async (patientId: string | undefined) => {
-    
     if (patientId) {
       // Navigate to the patient detail page with the patientId as a parameter
       navigate(`/addObservation/${patientId}`);
     }
-
-  }
+  };
 
   const filterAndSortObservation = () => {
     const filteredPatients = filterObservation(
@@ -167,8 +161,6 @@ const PatientDetails = () => {
   const handleRefresh = () => {
     fetchObservation(); // Fetch patients again to refresh the data
   };
-
-
 
   // Render patient details
   const renderPatientDetails = () => {
@@ -247,7 +239,6 @@ const PatientDetails = () => {
             </button>
           </div>
         ) : (
-
           <div className="flex justify-center mt-4">
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -267,10 +258,8 @@ const PatientDetails = () => {
         )}
         {/* Render other patient details */}
       </div>
-  
     );
   };
-
 
   const handleObservationPerPageChange = (value: string) => {
     const parsedValue = parseInt(value, 10);
@@ -293,7 +282,6 @@ const PatientDetails = () => {
     }
   };
 
-  
   return (
     <div>
       <div>
@@ -304,100 +292,102 @@ const PatientDetails = () => {
           {patient?.name?.[0]?.given + " " + patient?.name?.[0]?.family}
         </div>
       </div>
-      <div className="flex justify-center">
-        {renderPatientDetails()} 
-      </div>
-      <div className="flex justify-center">
-        
-      </div>
+      <div className="flex justify-center">{renderPatientDetails()}</div>
+      <div className="flex justify-center"></div>
 
       <div className="flex justify-center">
         <h1 className="text-2xl font-bold m-4">Patient Media</h1>
 
-        <button 
+        <button
           onClick={() => handleClick(patient?.id)}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 m-4 rounded text-lg ">
-            Add Observation
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 m-4 rounded text-lg "
+        >
+          Add Observation
         </button>
       </div>
 
-
-<div>
-      <div className="flex flex-wrap items-center mb-4 font-mono md:font-mono text-lg/5 md:text-lg/5 justify-center">
-        <select
-          className="rounded border-b-2 mr-2 font-mono md:font-mono text-lg/5 md:text-lg/5 mb-2 md:mb-0"
-          value={filterAttribute}
-          onChange={handleFilterAttributeChange}
-        >
-          <option value="">Search by</option>
-          <option value="identifier">Identifier</option>
-          <option value="status">Status</option>
-          <option value="type">Type of Media</option>
-          <option value="dateTime">Date Time</option>
-          <option value="bodySite">Body Site</option>
-          {/* Add options for other attributes */}
-        </select>
-        <select
-          className="rounded border-b-2 mr-2 font-mono md:font-mono text-lg/5 md:text-lg/5 mb-2 md:mb-0"
-          value={sortAttribute}
-          onChange={handleSortAttributeChange}
-        >
-          <option value="">Sort by</option>
-          <option value="identifier">Identifier</option>
-          <option value="status">Status</option>
-          <option value="type">Type of Media</option>
-          <option value="dateTime">Date Time</option>
-          <option value="bodySite">Body Site</option>
-          {/* Add options for other attributes */}
-        </select>
-        <input
-          className="rounded border-b-2 mr-2"
-          type="text"
-          value={searchText}
-          onChange={handleSearch}
-          placeholder="Search"
-        />
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={handleRefresh}
-        >
-          Refresh
-        </button>
-        
+      <div>
+        <div className="flex flex-wrap items-center mb-4 font-mono md:font-mono text-lg/5 md:text-lg/5 justify-center">
+          <select
+            className="rounded border-b-2 mr-2 font-mono md:font-mono text-lg/5 md:text-lg/5 mb-2 md:mb-0"
+            value={filterAttribute}
+            onChange={handleFilterAttributeChange}
+          >
+            <option value="">Search by</option>
+            <option value="identifier">Identifier</option>
+            <option value="status">Status</option>
+            <option value="type">Type of Media</option>
+            <option value="dateTime">Date Time</option>
+            <option value="bodySite">Body Site</option>
+            {/* Add options for other attributes */}
+          </select>
+          <select
+            className="rounded border-b-2 mr-2 font-mono md:font-mono text-lg/5 md:text-lg/5 mb-2 md:mb-0"
+            value={sortAttribute}
+            onChange={handleSortAttributeChange}
+          >
+            <option value="">Sort by</option>
+            <option value="identifier">Identifier</option>
+            <option value="status">Status</option>
+            <option value="type">Type of Media</option>
+            <option value="dateTime">Date Time</option>
+            <option value="bodySite">Body Site</option>
+            {/* Add options for other attributes */}
+          </select>
+          <input
+            className="rounded border-b-2 mr-2"
+            type="text"
+            value={searchText}
+            onChange={handleSearch}
+            placeholder="Search"
+          />
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={handleRefresh}
+          >
+            Refresh
+          </button>
         </div>
 
         <div className="flex flex-wrap items-center mb-4 font-mono md:font-mono text-lg/5 md:text-lg/5 justify-center">
-            <div className="ml-4">
-          <label htmlFor="numberSelect">Observation per Page:</label>
-            <select id="numberSelect" onChange={(e) => handleObservationPerPageChange(e.target.value)} defaultValue={"20"}>
+          <div className="ml-4">
+            <label htmlFor="numberSelect">Observation per Page:</label>
+            <select
+              id="numberSelect"
+              onChange={(e) => handleObservationPerPageChange(e.target.value)}
+              defaultValue={"20"}
+            >
               <option value="">Select a number</option>
               <option value="20">20</option>
               <option value="30">30</option>
               <option value="40">40</option>
               <option value="50">50</option>
-              
+
               {/* Add more options if needed */}
             </select>
           </div>
 
-
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-            onClick={() => handleOffsetObervationPerPageChange(offsetMediaPerPage - mediaPerPage)}
+            onClick={() =>
+              handleOffsetObervationPerPageChange(
+                offsetMediaPerPage - mediaPerPage
+              )
+            }
           >
             Prev {mediaPerPage} Observation
           </button>
 
-
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-            onClick={() => handleOffsetObervationPerPageChange(offsetMediaPerPage + mediaPerPage)}
+            onClick={() =>
+              handleOffsetObervationPerPageChange(
+                offsetMediaPerPage + mediaPerPage
+              )
+            }
           >
             Next {mediaPerPage} Observation
           </button>
-
-   
-
         </div>
       </div>
       <div className="overflow-x-auto">
@@ -457,9 +447,6 @@ const PatientDetails = () => {
           </tbody>
         </table>
       </div>
-
-
-  
     </div>
   );
 };
