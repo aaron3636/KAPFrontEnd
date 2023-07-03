@@ -89,7 +89,6 @@ const ObservationDetails = () => {
     event: FormEvent,
     editedObservation: fhirR4.Observation
   ) => {
-    editedObservation.effectiveDateTime += ":00+02:00";
     event.preventDefault();
     try {
       const response = await fetch(
