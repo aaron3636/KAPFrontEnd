@@ -7,22 +7,36 @@ import Welcome from "./components/Welcome";
 import PatientDetails from "./components/PatientDetails";
 import ObservationInput from "./components/ObservationInput";
 import ObservationDetails from "./components/ObservationDetails";
+import { useAuth0 } from "@auth0/auth0-react";
 
 function App() {
+  const { isAuthenticated } = useAuth0();
+
+
   return (
     <Router>
       <div className="min-h-screen flex flex-col">
-        <Routes>
-          <Route path="/" element={<Welcome />} />
-          <Route path="/patient" element={<PatientList />} />
-          <Route path="/add" element={<PatientForm />} />
-          <Route path="/patient/:patientId" element={<PatientDetails />} />
-          <Route path="/addObservation/:patientId" element={<ObservationInput />} />
-          <Route path="/observation/:observationId" element={<ObservationDetails />} />
-        </Routes>
+        {isAuthenticated ? (
+          <Routes> 
+            <Route path="/" element={<Welcome />} />
+            <Route path="/patient" element={<PatientList />} />
+            <Route path="/add" element={<PatientForm />} />
+            <Route path="/patient/:patientId" element={<PatientDetails />} />
+            <Route path="/addObservation/:patientId" element={<ObservationInput />} />
+            <Route path="/observation/:observationId" element={<ObservationDetails />} />
+          </Routes>
+        ) : (
+          <Routes>
+            <Route path="/" element={<Welcome />} />
+          </Routes>
+        )}
       </div>
     </Router>
   );
 }
 
 export default App;
+
+
+
+
