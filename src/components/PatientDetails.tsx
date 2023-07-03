@@ -7,7 +7,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import EditPatientForm from "./EditPatientForm";
-import Observations from "./ObservationList";
 
 const PatientDetails = () => {
   const { patientId } = useParams();
@@ -165,17 +164,7 @@ const PatientDetails = () => {
           <span className="font-semibold">Attachments:</span>{" "}
           {renderPatientPhotos(patient)}
         </div>
-        {isEditMode ? (
-          <div className="flex justify-center mt-4">
-            <button
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
-              onClick={(event) => handleSave(event, editedPatient)}
-            >
-              <FontAwesomeIcon icon={faSave} className="mr-2" />
-              Save
-            </button>
-          </div>
-        ) : (
+        {
           <div className="flex justify-center mt-4">
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -192,10 +181,15 @@ const PatientDetails = () => {
               Delete
             </button>
           </div>
-        )}
+        }
         {/* Render other patient details */}
       </div>
     );
+  };
+  const handleObservationsClick = (patientId: string | undefined) => {
+    if (patientId) {
+      navigate(`/observations/${patientId}`);
+    }
   };
 
   return (
@@ -211,7 +205,14 @@ const PatientDetails = () => {
       <div className="flex items-center justify-center min-h-screen">
         {renderPatientDetails()}
       </div>
-      <Observations></Observations>
+      <div className="flex justify-center">
+        <button
+          onClick={() => handleObservationsClick(patient?.id)}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 m-4 rounded text-lg"
+        >
+          Show Observations
+        </button>
+      </div>
     </div>
   );
 };

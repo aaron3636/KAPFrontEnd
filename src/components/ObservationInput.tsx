@@ -13,7 +13,7 @@ const ObservationInput: React.FC = () => {
 
   /**
    * Handles the form submission event.
-   * POST to "http://localhost:8080/fhir/Observation" and 
+   * POST to "http://localhost:8080/fhir/Observation" and
    * POST to "http://localhost:8080/fhir/Media"
    * @param e - The form submission event.
    */
@@ -28,81 +28,96 @@ const ObservationInput: React.FC = () => {
 
     //define the status of the Media
     let statusValueMedia = (
-        e.currentTarget.elements.namedItem("statusMedia") as HTMLInputElement
+      e.currentTarget.elements.namedItem("statusMedia") as HTMLInputElement
     ).value;
-    const statusMedia : fhirR4.Code =
-          statusValueMedia === "preparation" ||
-          statusValueMedia === "in-progress" ||
-          statusValueMedia === "not-done" ||
-          statusValueMedia === "on-hold" ||
-          statusValueMedia === "stopped" ||
-          statusValueMedia === "completed" ||
-          statusValueMedia === "entered-in-error" ||
-          statusValueMedia === "unknown"
-            ? statusValueMedia
-            : "preliminary";
-
+    const statusMedia: fhirR4.Code =
+      statusValueMedia === "preparation" ||
+      statusValueMedia === "in-progress" ||
+      statusValueMedia === "not-done" ||
+      statusValueMedia === "on-hold" ||
+      statusValueMedia === "stopped" ||
+      statusValueMedia === "completed" ||
+      statusValueMedia === "entered-in-error" ||
+      statusValueMedia === "unknown"
+        ? statusValueMedia
+        : "preliminary";
 
     let statusValueObservation = (
-      e.currentTarget.elements.namedItem("statusObservation") as HTMLInputElement
+      e.currentTarget.elements.namedItem(
+        "statusObservation"
+      ) as HTMLInputElement
     ).value;
     const statusObservation: fhirR4.Observation.StatusEnum | undefined =
       statusValueObservation === "registered" ||
       statusValueObservation === "preliminary" ||
       statusValueObservation === "final"
-        ? statusValueObservation : "preliminary";
-
+        ? statusValueObservation
+        : "preliminary";
 
     const observationCategory = new fhirR4.CodeableConcept();
-    //define the  
-    const newCategoryCoding = new fhirR4.Coding(); 
-    newCategoryCoding.system = "http://hl7.org/fhir/ValueSet/observation-category";
-    newCategoryCoding.code = (e.currentTarget.elements.namedItem("category") as HTMLInputElement).value;
+    //define the
+    const newCategoryCoding = new fhirR4.Coding();
+    newCategoryCoding.system =
+      "http://hl7.org/fhir/ValueSet/observation-category";
+    newCategoryCoding.code = (
+      e.currentTarget.elements.namedItem("category") as HTMLInputElement
+    ).value;
     observationCategory.coding = [newCategoryCoding];
 
-
     const newObservationCoding = new fhirR4.CodeableConcept();
-    //define the Observation coding 
-    const newTypeOfObservationCoding = new fhirR4.Coding(); 
-    newTypeOfObservationCoding.system = "http://hl7.org/fhir/ValueSet/observation-codes";
-    newTypeOfObservationCoding.code = (e.currentTarget.elements.namedItem("loinc_code") as HTMLInputElement).value;
+    //define the Observation coding
+    const newTypeOfObservationCoding = new fhirR4.Coding();
+    newTypeOfObservationCoding.system =
+      "http://hl7.org/fhir/ValueSet/observation-codes";
+    newTypeOfObservationCoding.code = (
+      e.currentTarget.elements.namedItem("loinc_code") as HTMLInputElement
+    ).value;
     newObservationCoding.coding = [newTypeOfObservationCoding];
 
     //define the tyep of Media
     const typeOfMedia = new fhirR4.CodeableConcept();
-    const typeOfMediaCoding = new fhirR4.Coding(); 
-    typeOfMediaCoding.system = "http://terminology.hl7.org/CodeSystem/media-type";
-    typeOfMediaCoding.code = (e.currentTarget.elements.namedItem("typeOfMedia") as HTMLInputElement).value;
+    const typeOfMediaCoding = new fhirR4.Coding();
+    typeOfMediaCoding.system =
+      "http://terminology.hl7.org/CodeSystem/media-type";
+    typeOfMediaCoding.code = (
+      e.currentTarget.elements.namedItem("typeOfMedia") as HTMLInputElement
+    ).value;
     typeOfMedia.coding = [typeOfMediaCoding];
 
     //define the patient reference
-    const newPatientReference = new fhirR4.Reference(); 
-    newPatientReference.type = "Patient"; 
-    newPatientReference.reference = 'Patient/' + patientId;
+    const newPatientReference = new fhirR4.Reference();
+    newPatientReference.type = "Patient";
+    newPatientReference.reference = "Patient/" + patientId;
 
     //define the dateTime in the needed format
-    const dateTime = (e.currentTarget.elements.namedItem("dateTime") as HTMLInputElement).value + ":00+02:00";
-    
+    const dateTime =
+      (e.currentTarget.elements.namedItem("dateTime") as HTMLInputElement)
+        .value + ":00+02:00";
+
     //define the bodySite
-    const bodySite = new fhirR4.CodeableConcept(); 
-    const bodySiteCoding = new fhirR4.Coding(); 
+    const bodySite = new fhirR4.CodeableConcept();
+    const bodySiteCoding = new fhirR4.Coding();
     bodySiteCoding.system = "http://hl7.org/fhir/ValueSet/body-site";
-    bodySiteCoding.code = (e.currentTarget.elements.namedItem("bodySite") as HTMLInputElement).value;
+    //TODO: add coding part instead of using same for text and code
+    bodySiteCoding.code = (
+      e.currentTarget.elements.namedItem("bodySite") as HTMLInputElement
+    ).value;
     bodySite.coding = [bodySiteCoding];
+    bodySite.text = (
+      e.currentTarget.elements.namedItem("bodySite") as HTMLInputElement
+    ).value;
 
     //deifne the annotation
-    const note = new fhirR4.Annotation(); 
-    note.text = (e.currentTarget.elements.namedItem("note") as HTMLInputElement).value;
-
-
-
+    const note = new fhirR4.Annotation();
+    note.text = (
+      e.currentTarget.elements.namedItem("note") as HTMLInputElement
+    ).value;
+    note.time = dateTime;
 
     if (selectedFiles) {
-
-      const derivedFrom : fhirR4.Reference[] = []; 
+      const derivedFrom: fhirR4.Reference[] = [];
 
       for (let i = 0; i < selectedFiles.length; ++i) {
-
         const file: string = selectedFiles[i];
 
         const fileDataAsString = file.split(",")[1];
@@ -120,70 +135,68 @@ const ObservationInput: React.FC = () => {
         mediaIdentifier.value = uuidv4();
 
         //references the Media: Observation -> Media
-        const referenceMedia = new fhirR4.Reference(); 
+        const referenceMedia = new fhirR4.Reference();
         referenceMedia.type = "Media";
         referenceMedia.identifier = mediaIdentifier;
 
         //references the Oberservation: Media -> Observation
-        const referenceObservation = new fhirR4.Reference(); 
+        const referenceObservation = new fhirR4.Reference();
         referenceObservation.type = "Observation";
         referenceObservation.identifier = newIdentifier;
 
-        const media : fhirR4.Media = {
-          identifier: [mediaIdentifier], 
+        const media: fhirR4.Media = {
+          identifier: [mediaIdentifier],
           partOf: [referenceObservation],
-          status: statusMedia, 
-          type: typeOfMedia, 
-          subject: newPatientReference, 
-          createdDateTime: dateTime, 
-          bodySite: bodySite, 
-          content: photoAttachment, 
-          note: [note], 
-          resourceType: "Media"
+          status: statusMedia,
+          type: typeOfMedia,
+          subject: newPatientReference,
+          createdDateTime: dateTime,
+          bodySite: bodySite,
+          content: photoAttachment,
+          note: [note],
+          resourceType: "Media",
         };
 
         derivedFrom.push(referenceMedia);
 
         console.log(JSON.stringify(media));
         fetch("http://localhost:8080/fhir/Media", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(media),
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(media),
         })
-        .then((response) => {
-          if (!response.ok) {
+          .then((response) => {
+            if (!response.ok) {
+              setSubmissionStatus("failure");
+            }
+            response.json();
+          })
+          .then((data) => {
+            // Handle the response from the API
+            console.log("Response from API:", data);
+          })
+          .catch((error) => {
+            // Handle any errors that occur during the request
+            console.error("Error:", error);
             setSubmissionStatus("failure");
-          } 
-          response.json();
-        })
-        .then((data) => {
-          // Handle the response from the API
-
-          //I THINK THIS IS NOT IMPORTANT? 
-          console.log("Response from API:", data);
-        })
-        .catch((error) => {
-          // Handle any errors that occur during the request
-          console.error("Error:", error);
-          setSubmissionStatus("failure");
-        });
-
+          });
       }
 
       console.log(derivedFrom);
-      
 
       const observation: fhirR4.Observation = {
-        identifier: [newIdentifier], 
-        status: statusObservation, 
+        identifier: [newIdentifier],
+        status: statusObservation,
         category: [observationCategory],
         code: newObservationCoding,
         effectiveDateTime: dateTime,
         derivedFrom: derivedFrom,
         subject: newPatientReference,
-        resourceType: "Observation"
+        resourceType: "Observation",
+        bodySite: bodySite,
+        note: [note],
       };
 
       console.log(JSON.stringify(observation));
@@ -204,8 +217,6 @@ const ObservationInput: React.FC = () => {
         })
         .then((data) => {
           // Handle the response from the API
-
-          //I THINK THIS IS NOT IMPORTANT? 
           console.log("Response from API:", data);
         })
         .catch((error) => {
@@ -214,28 +225,28 @@ const ObservationInput: React.FC = () => {
           setSubmissionStatus("failure");
         });
     }
-};
+  };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files); // Convert FileList to an array
-  
+
       Promise.all(
         files.map((file) => {
           return new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
-  
+
             reader.onload = (event: ProgressEvent<FileReader>) => {
               if (event.target && event.target.result) {
                 const base64Binary = event.target.result.toString();
                 resolve(base64Binary);
               }
             };
-  
+
             reader.onerror = (event: ProgressEvent<FileReader>) => {
               reject(event.target?.error);
             };
-  
+
             reader.readAsDataURL(file); // Read the file as data URL
           });
         })
@@ -247,11 +258,11 @@ const ObservationInput: React.FC = () => {
           ]); // Append the new base64 binaries to the existing state
         })
         .catch((error) => {
-          console.error('Error converting files:', error);
+          console.error("Error converting files:", error);
         });
     }
   };
-  
+
   return (
     <div>
       <div>
@@ -260,10 +271,11 @@ const ObservationInput: React.FC = () => {
       <div className="flex justify-center p-10 bg-sky-800 text-4xl text-white mb-10">
         Enter new Observation
       </div>
-      <form className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3"
-        onSubmit={handleSubmit}>
-
-       <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
+      <form
+        className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3"
+        onSubmit={handleSubmit}
+      >
+        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
           <label>
             Identifier:
             <input
@@ -280,7 +292,12 @@ const ObservationInput: React.FC = () => {
         <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
           <label>
             Status Media:
-            <select className="text-sm" name="statusMedia" defaultValue="" required>
+            <select
+              className="text-sm"
+              name="statusMedia"
+              defaultValue=""
+              required
+            >
               <option value="" disabled>
                 Select Status
               </option>
@@ -299,8 +316,13 @@ const ObservationInput: React.FC = () => {
 
         <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
           <label>
-          Observation Status:
-            <select className="text-sm" name="statusObservation" defaultValue="" required>
+            Observation Status:
+            <select
+              className="text-sm"
+              name="statusObservation"
+              defaultValue=""
+              required
+            >
               <option value="" disabled>
                 Select Status
               </option>
@@ -312,11 +334,15 @@ const ObservationInput: React.FC = () => {
           <br />
         </div>
 
-
         <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
           <label>
             Observation Category
-            <select className="text-sm" name="category" defaultValue="" required>
+            <select
+              className="text-sm"
+              name="category"
+              defaultValue=""
+              required
+            >
               <option value="" disabled>
                 Select category
               </option>
@@ -332,7 +358,6 @@ const ObservationInput: React.FC = () => {
           </label>
           <br />
         </div>
-
 
         <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
           <label>
@@ -350,7 +375,12 @@ const ObservationInput: React.FC = () => {
         <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
           <label>
             Type of Media
-            <select className="text-sm" name="typeOfMedia" defaultValue="" required>
+            <select
+              className="text-sm"
+              name="typeOfMedia"
+              defaultValue=""
+              required
+            >
               <option value="" disabled>
                 Select type of Media
               </option>
@@ -370,19 +400,16 @@ const ObservationInput: React.FC = () => {
               type="datetime-local"
               name="dateTime"
               required
+              defaultValue={new Date().toISOString().slice(0, 16)}
             />
           </label>
           <br />
         </div>
-      
+
         <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
           <label>
             BodySite:
-            <input 
-                className="rounded border-b-2"
-                type="text"
-                name="bodySite"
-                />
+            <input className="rounded border-b-2" type="text" name="bodySite" />
           </label>
           <br />
         </div>
@@ -391,10 +418,10 @@ const ObservationInput: React.FC = () => {
           <label>
             Note:
             <div>
-                <textarea
+              <textarea
                 className="resize border rounded-md"
-                name="note">
-                </textarea>
+                name="note"
+              ></textarea>
             </div>
           </label>
           <br />
@@ -403,7 +430,13 @@ const ObservationInput: React.FC = () => {
         <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
           <label>
             Photo:
-            <input type="file" accept="image/*" onChange={handlePhotoChange} multiple required/>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoChange}
+              multiple
+              required
+            />
           </label>
           <br />
         </div>
@@ -411,19 +444,25 @@ const ObservationInput: React.FC = () => {
         <div className="justify-center flex-2">
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded object-center text-lg "
-            type="submit">
+            type="submit"
+          >
             Submit
           </button>
         </div>
 
-        <SubmissionStatus 
-          submissionStatus={submissionStatus} 
-          submissionTextSucess={"Observation was successfully added to the Database."} 
+        <SubmissionStatus
+          submissionStatus={submissionStatus}
+          submissionTextSucess={
+            "Observation was successfully added to the Database."
+          }
           submissionHeadlineSucess={"Submission successful!"}
           submissionHeadlineFailure={"Submission failed. Please try again."}
-          submissionTextFailure={"Observation could not be successfully added to the Database."}></SubmissionStatus>
+          submissionTextFailure={
+            "Observation could not be successfully added to the Database."
+          }
+        ></SubmissionStatus>
       </form>
-    </div> 
+    </div>
   );
 };
 

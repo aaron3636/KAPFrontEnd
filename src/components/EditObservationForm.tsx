@@ -1,80 +1,72 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { fhirR4 } from "@smile-cdr/fhirts";
+import { faSave } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface EditObservationFormProps {
   observation: fhirR4.Observation;
   media: fhirR4.Media[];
-  onSave: (event: FormEvent, editedObservation: fhirR4.Observation, editedMedia: fhirR4.Media[]) => Promise<void>;
+  onSave: (
+    event: FormEvent,
+    editedObservation: fhirR4.Observation,
+    editedMedia: fhirR4.Media[]
+  ) => Promise<void>;
   onCancel: () => void;
 }
 
 const EditObservationForm: React.FC<EditObservationFormProps> = ({
   observation,
-  media, 
+  media,
   onSave,
   onCancel,
 }) => {
-  const [editedObservation, setEditedObservation] = useState<fhirR4.Observation>(observation);
-  const [editedMedia, setEditedMedia] = useState<fhirR4.Media[]>([]);
+  const [editedObservation, setEditedObservation] =
+    useState<fhirR4.Observation>(observation);
+  const [editedMedia, setEditedMedia] = useState<fhirR4.Media[]>(media);
 
-  //TODO: Upgrade
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>): void => {
-    // Extract the name and value from the event target (input field)
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
+  ): void => {
     const { name, value } = e.target;
+
     if (name === "identifier") {
-        // Handle BirthDate field differently
-        const newIdentifier = new fhirR4.Identifier();
-            newIdentifier.value = value;
-        setEditedObservation((prevObservation) => ({
-            ...prevObservation,
-            identifier: [newIdentifier],
-        }));
+      const newIdentifier = new fhirR4.Identifier();
+      newIdentifier.value = value;
 
+      setEditedObservation((prevObservation) => ({
+        ...prevObservation,
+        identifier: [newIdentifier],
+      }));
     } else if (name === "status") {
-        const statusValue: fhirR4.Observation.StatusEnum | undefined =
-        value === "registered" ||
-        value === "preliminary" ||
-        value === "final"
-        ? value : "preliminary";
-
-        setEditedObservation((prevObservation) => ({
-            ...prevObservation,
-            status: statusValue,
-            }));  
+      const statusValue: fhirR4.Observation.StatusEnum | undefined =
+        value === "registered" || value === "preliminary" || value === "final"
+          ? (value as fhirR4.Observation.StatusEnum)
+          : "preliminary";
+      setEditedObservation((prevObservation) => ({
+        ...prevObservation,
+        status: statusValue,
+      }));
     } else if (name === "category") {
+      const observationCategory = new fhirR4.CodeableConcept();
+      const newCategoryCoding = new fhirR4.Coding();
+      newCategoryCoding.system =
+        "http://hl7.org/fhir/ValueSet/observation-category";
+      newCategoryCoding.code = value;
+      observationCategory.coding = [newCategoryCoding];
 
-        const observationCategory = new fhirR4.CodeableConcept();
-        //define the  
-        const newCategoryCoding = new fhirR4.Coding(); 
-        newCategoryCoding.system = "http://hl7.org/fhir/ValueSet/observation-category";
-        newCategoryCoding.code = value;
-        observationCategory.coding = [newCategoryCoding];
-
-        setEditedObservation((prevObservation) => ({
-            ...prevObservation,
-            effectiveDateTime: value + ":00+02:00",
-            }));
+      setEditedObservation((prevObservation) => ({
+        ...prevObservation,
+        category: [observationCategory],
+      }));
     } else if (name === "date") {
-        setEditedObservation((prevObservation) => ({
-            ...prevObservation,
-            effectiveDateTime: value + ":00+02:00",
-            }));
+      setEditedObservation((prevObservation) => ({
+        ...prevObservation,
+        effectiveDateTime: value,
+      }));
     } else {
-      // Update the editedPatient state
-      setEditedObservation((prevPatient) => ({
-        // Create a new object with the same properties as prevPatient
-        ...prevPatient,
-        // Update the name property with the new value
-        name: [
-          // Create a new name array with the updated value
-          {
-            // Copy the existing name object or create a new one if it doesn't exist
-            //...prevPatient.status?.[0],
-            // Update the specific field (identified by the name) with the new value
-            [name]: value,
-          },
-        ],
+      setEditedObservation((prevObservation) => ({
+        ...prevObservation,
+        [name]: value,
       }));
     }
   };
@@ -89,66 +81,95 @@ const EditObservationForm: React.FC<EditObservationFormProps> = ({
       <h2 className="text-2xl font-bold mb-4">Edit Observation</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="givenName" className="text-lg font-medium">
+          <label htmlFor="identifier" className="text-lg font-medium">
             Identifier:
           </label>
           <input
             type="text"
             id="identifier"
             name="identifier"
-            value={editedObservation.identifier?.[0]?.value|| ""}
+            value={editedObservation.identifier?.[0]?.value || ""}
             onChange={handleInputChange}
             className="w-full border border-gray-300 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
 
         <div className="mb-4">
-            <label htmlFor="givenName" className="text-lg font-medium0">
-                Status:
-            </label>
-                <select className="w-full border border-gray-300 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-1 focus:ring-blue-500" name="status" defaultValue={editedObservation.status} 
-                onChange={handleInputChange}>
-                    <option value="" disabled>
-                        Select Status
-                    </option>
-                    <option value="registered">registered</option>
-                    <option value="preliminary">preliminary</option>
-                    <option value="final">final</option>
-                </select>
+          <label htmlFor="status" className="text-lg font-medium">
+            Status:
+          </label>
+          <select
+            id="status"
+            name="status"
+            value={editedObservation.status}
+            onChange={handleInputChange}
+            className="w-full border border-gray-300 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="" disabled>
+              Select Status
+            </option>
+            <option value="registered">registered</option>
+            <option value="preliminary">preliminary</option>
+            <option value="final">final</option>
+          </select>
         </div>
 
         <div className="mb-4">
-          <label htmlFor="familyName" className="text-lg font-medium">
+          <label htmlFor="category" className="text-lg font-medium">
             Category:
           </label>
-          <select className="w-full border border-gray-300 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-1 focus:ring-blue-500" name="category" defaultValue="" onChange={handleInputChange}>
-              <option value="" disabled>
-                Select category
-              </option>
-              <option value="vital-signs">vital-signs</option>
-              <option value="imaging">imaging</option>
-              <option value="labratory">labratory</option>
-              <option value="procedure">procedure</option>
-              <option value="survey">survey</option>
-              <option value="exam">exam</option>
-              <option value="therapy">therapy</option>
-              <option value="activity">activity</option>
-            </select>
+          <select
+            id="category"
+            name="category"
+            value={editedObservation.category?.[0]?.coding?.[0]?.code || ""}
+            onChange={handleInputChange}
+            className="w-full border border-gray-300 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="" disabled>
+              Select category
+            </option>
+            <option value="vital-signs">vital-signs</option>
+            <option value="imaging">imaging</option>
+            <option value="labratory">labratory</option>
+            <option value="procedure">procedure</option>
+            <option value="survey">survey</option>
+            <option value="exam">exam</option>
+            <option value="therapy">therapy</option>
+            <option value="activity">activity</option>
+          </select>
         </div>
+
         <div className="mb-4">
-          <label htmlFor="birthdate" className="text-lg font-medium">
+          <label htmlFor="date" className="text-lg font-medium">
             Date:
           </label>
           <input
             type="datetime-local"
             id="date"
             name="date"
-            defaultValue={editedObservation.effectiveDateTime}
+            value={editedObservation.effectiveDateTime || ""}
             onChange={handleInputChange}
             className="w-full border border-gray-300 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
         {/* Add more fields as needed */}
+        <div className="flex justify-center mt-6">
+          <button
+            type="submit"
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
+          >
+            <FontAwesomeIcon icon={faSave} className="mr-2" />
+            Save
+          </button>
+          <button
+            type="button"
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            onClick={onCancel}
+          >
+            {/*<FontAwesomeIcon icon={faCancel} className="mr-2" />*/}
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );
