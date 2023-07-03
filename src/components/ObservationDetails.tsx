@@ -10,15 +10,14 @@ import EditObservationForm from "./EditObservationForm";
 import BundleEntry from "./BundleEntry";
 
 const ObservationDetails = () => {
-  const {observationId} = useParams();
+  const { observationId } = useParams();
   const [observation, setObservation] = useState<fhirR4.Observation>();
   const [media, setMedia] = useState<fhirR4.Media[]>([]);
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [editedObservation, setEditedObservation] = useState<fhirR4.Observation>(
-    {} as fhirR4.Observation
-  );
+  const [editedObservation, setEditedObservation] =
+    useState<fhirR4.Observation>({} as fhirR4.Observation);
 
   const navigate = useNavigate();
 
@@ -28,55 +27,51 @@ const ObservationDetails = () => {
 
   const fetchObservation = async () => {
     try {
+      console.log(`http://localhost:8080/fhir/Observation/${observationId}`);
+      const response = await fetch(
+        `http://localhost:8080/fhir/Observation/${observationId}`
+      );
+      const observationData = await response.json();
 
-        console.log(`http://localhost:8080/fhir/Observation/${observationId}`)
-        const response = await fetch(
-            `http://localhost:8080/fhir/Observation/${observationId}`
-        );
-        const observationData = await response.json();
+      console.log(observationData);
+      setObservation(observationData);
 
-        console.log(observationData);
-        setObservation(observationData);
+      const media_array: fhirR4.Media[] = [];
 
-        const media_array : fhirR4.Media[] = [];
+      if (observationData) {
+        const array_derivedFrom = observationData.derivedFrom;
 
-        if (observationData) {
-            const array_derivedFrom = observationData.derivedFrom; 
+        console.log(array_derivedFrom);
+        if (array_derivedFrom) {
+          for (let i = 0; i < array_derivedFrom.length; ++i) {
+            try {
+              const responseMedia = await fetch(
+                `http://localhost:8080/fhir/Media?identifier=${array_derivedFrom[i].identifier?.value}`
+              );
 
-            console.log(array_derivedFrom);
-            if (array_derivedFrom) {
-                for (let i = 0; i < array_derivedFrom.length; ++i) {
-                    try {
+              const dataMedia = await responseMedia.json();
+              const mediaData = dataMedia.entry.map(
+                (entry: BundleEntry) => entry.resource
+              );
 
-                        const responseMedia = await fetch(
-                            `http://localhost:8080/fhir/Media?identifier=${array_derivedFrom[i].identifier?.value}`
-                        );
-
-                        const dataMedia = await responseMedia.json();
-                        const mediaData = dataMedia.entry.map(
-                            (entry: BundleEntry) => entry.resource
-                        );
-
-                        media_array.push(mediaData[0]);
-                        console.log(mediaData);
-
-                    } catch (error) {
-                        console.error("Error fetching Media:", error);
-                    }
-                }
-            }   
+              media_array.push(mediaData[0]);
+              console.log(mediaData);
+            } catch (error) {
+              console.error("Error fetching Media:", error);
+            }
+          }
         }
+      }
 
-        console.log(media_array);
-        setMedia(media_array);
-
+      console.log(media_array);
+      setMedia(media_array);
     } catch (error) {
       console.error("Error fetching Observation:", error);
     }
   };
 
   // Function to handle the edit button click
-  
+
   const handleEdit = () => {
     setIsEditMode(true);
     if (observation) {
@@ -89,15 +84,12 @@ const ObservationDetails = () => {
   };
 
   // Function to handle the SAVE
-  /*
-   * (This do nothings till now as the edit capabilty is not yet implemented!).
-   * PLEASE DON´T TOUCH THE SAVE ICON :) .
-   */
-  
+
   const handleSave = async (
     event: FormEvent,
     editedObservation: fhirR4.Observation
   ) => {
+    editedObservation.effectiveDateTime += ":00+02:00";
     event.preventDefault();
     try {
       const response = await fetch(
@@ -112,6 +104,7 @@ const ObservationDetails = () => {
       );
       if (response.ok) {
         setObservation(editedObservation);
+        console.log(response);
         setIsEditMode(false);
       } else {
         console.error("Failed to save patient data");
@@ -120,11 +113,9 @@ const ObservationDetails = () => {
       console.error("Error saving patient data:", error);
     }
   };
-  
 
   // Function to handle DELETE
 
-  
   const handleDelete = async () => {
     try {
       const response = await fetch(
@@ -142,15 +133,13 @@ const ObservationDetails = () => {
       console.error("Error deleting patient:", error);
     }
   };
-  
-
 
   // Render patient details
   const renderObservationDetails = () => {
     if (!observation) {
       return <p className="text-gray-500 text-lg">Loading...</p>;
     }
-    
+
     if (isEditMode) {
       return (
         <EditObservationForm
@@ -161,7 +150,6 @@ const ObservationDetails = () => {
         />
       );
     }
-    
 
     return (
       <div className="max-w-md mx-auto p-4 bg-white shadow-lg rounded-lg">
@@ -180,7 +168,7 @@ const ObservationDetails = () => {
               {observation.status}
             </p>
             <p className="text-sm mb-2">
-              <span className="font-semibold">Category</span> 
+              <span className="font-semibold">Category</span>
               {observation.category?.[0]?.coding?.[0]?.code}
             </p>
             <p className="text-sm mb-2">
@@ -203,9 +191,25 @@ const ObservationDetails = () => {
           <span className="font-semibold">Attachments:</span>{" "}
           <RenderObservationPhotos media={media}></RenderObservationPhotos>
         </div>
-        
+        {
+          <div className="flex justify-center mt-4">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={handleEdit}
+            >
+              <FontAwesomeIcon icon={faEdit} className="mr-2" />
+              Edit
+            </button>
+            <button
+              className="ml-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              onClick={handleDelete}
+            >
+              <FontAwesomeIcon icon={faTrash} className="mr-2" />
+              Delete
+            </button>
+          </div>
+        }
       </div>
-  
     );
   };
 
@@ -219,83 +223,9 @@ const ObservationDetails = () => {
           {"Observation " + observation?.id}
         </div>
       </div>
-      <div className="flex justify-center">
-        {renderObservationDetails()} 
-      </div>
-      {isEditMode ? (
-          <div className="flex justify-center mt-4">
-            <button
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
-              onClick={(event) => handleSave(event, editedObservation)}
-            >
-              <FontAwesomeIcon icon={faSave} className="mr-2" />
-              Save
-            </button>
-            <button
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-              onClick={() => handleCancelEdit()}
-            >
-         
-              Cancel
-            </button>
-          </div>
-          
-        ) : (
-
-          <div className="flex justify-center mt-4">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={handleEdit}
-            >
-              <FontAwesomeIcon icon={faEdit} className="mr-2" />
-              Edit
-            </button>
-            <button
-              className="ml-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-              onClick={handleDelete}
-            >
-              <FontAwesomeIcon icon={faTrash} className="mr-2" />
-              Delete
-            </button>
-          </div>
-        )}
+      <div className="flex justify-center">{renderObservationDetails()}</div>
     </div>
-  )
-} 
+  );
+};
 
-export default ObservationDetails; 
-
-
-/*
-{isEditMode ? (
-          <div className="flex justify-center mt-4">
-            <button
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
-              onClick={(event) => handleSave(event, editedObservation)}
-            >
-              <FontAwesomeIcon icon={faSave} className="mr-2" />
-              Save
-            </button>
-          </div>
-        ) : (
-
-          <div className="flex justify-center mt-4">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={handleEdit}
-            >
-              <FontAwesomeIcon icon={faEdit} className="mr-2" />
-              Edit
-            </button>
-            <button
-              className="ml-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-              onClick={handleDelete}
-            >
-              <FontAwesomeIcon icon={faTrash} className="mr-2" />
-              Delete
-            </button>
-          </div>
-        )}
-        {/* Render other patient details */
-
-
+export default ObservationDetails;

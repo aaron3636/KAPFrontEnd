@@ -7,16 +7,12 @@ import BundleEntry from "./BundleEntry";
 
 const Observations = () => {
   const { patientId } = useParams();
-  const [patient, setPatient] = useState<fhirR4.Patient | null>(null);
   const [media, setMedia] = useState<fhirR4.Observation[]>([]);
   const [searchText, setSearchText] = useState("");
   const [filterAttribute, setFilterAttribute] = useState("identifier");
   const [sortAttribute, setSortAttribute] = useState("");
   const [mediaPerPage, setMediaPerPage] = useState(20);
   const [offsetMediaPerPage, setoffsetMediaPerPage] = useState(0);
-  const [editedPatient, setEditedPatient] = useState<fhirR4.Patient>(
-    {} as fhirR4.Patient
-  );
 
   const navigate = useNavigate();
 
@@ -26,8 +22,7 @@ const Observations = () => {
 
   const handleClickAddObservation = async (patientId: string | undefined) => {
     if (patientId) {
-      // Navigate to the patient detail page with the patientId as a parameter
-      navigate(`/addObservation/${patientId}`);
+      navigate(`/observations/addObservation/${patientId}`);
     }
   };
 
@@ -104,7 +99,7 @@ const Observations = () => {
         <h1 className="text-2xl font-bold m-4">Patient Media</h1>
 
         <button
-          onClick={() => handleClickAddObservation(patient?.id)}
+          onClick={() => handleClickAddObservation(patientId)}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 m-4 rounded text-lg "
         >
           Add Observation
@@ -242,6 +237,9 @@ const Observations = () => {
                 </td>
                 <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
                   {observation.effectiveDateTime}
+                </td>
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 whitespace-nowrap">
+                  {observation.bodySite?.text}
                 </td>
                 <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 whitespace-nowrap">
                   {observation.note?.[0]?.text}
