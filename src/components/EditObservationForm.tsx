@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { fhirR4 } from "@smile-cdr/fhirts";
-import { faSave } from "@fortawesome/free-solid-svg-icons";
+import { faSave, faBan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface EditObservationFormProps {
@@ -144,7 +144,7 @@ const EditObservationForm: React.FC<EditObservationFormProps> = ({
             Date:
           </label>
           <input
-            type="datetime-local"
+            type="datetime"
             id="date"
             name="date"
             value={editedObservation.effectiveDateTime || ""}
@@ -166,7 +166,7 @@ const EditObservationForm: React.FC<EditObservationFormProps> = ({
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
             onClick={onCancel}
           >
-            {/*<FontAwesomeIcon icon={faCancel} className="mr-2" />*/}
+            <FontAwesomeIcon icon={faBan} className="mr-2" />
             Cancel
           </button>
         </div>

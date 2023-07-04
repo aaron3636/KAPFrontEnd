@@ -17,7 +17,7 @@ function App() {
     <Router>
       <div className="min-h-screen flex flex-col">
         {isAuthenticated ? (
-          <Routes> 
+          <Routes>
             <Route path="/" element={<Welcome />} />
             <Route path="/patient" element={<PatientList />} />
             <Route path="/add" element={<PatientForm />} />
@@ -31,7 +31,7 @@ function App() {
               path="/observation/:observationId"
               element={<ObservationDetails />}
             />
-        </Routes>
+          </Routes>
         ) : (
           <Routes>
             <Route path="/" element={<Welcome />} />
@@ -43,7 +43,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
