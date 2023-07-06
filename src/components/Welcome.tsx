@@ -18,9 +18,11 @@ function Welcome() {
       <h1 className="welcome-screen-title">
         Welcome to the Patients Management System
       </h1>
-      <button onClick={accessToken}> Click me "Open console and see the jwt token for Postman" </button>
+      
       {isAuthenticated ? 
+
         (<div className="welcome-screen-options "> 
+        <button onClick={accessToken}> Click me "Open console and see the jwt token for Postman" </button>
           <Link to="/patient" className="welcome-screen-option search">
             <span className="welcome-screen-option-icon">🔍</span>
             <span className="welcome-screen-option-text">
