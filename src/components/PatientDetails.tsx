@@ -7,8 +7,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import EditPatientForm from "./EditPatientForm";
+import SubmissionStatus from "./SubmissonStatus";
 
 const PatientDetails = () => {
+  const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
   const { patientId } = useParams();
   const [patient, setPatient] = useState<fhirR4.Patient | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -91,9 +93,11 @@ const PatientDetails = () => {
       if (response.ok) {
         navigate(`/patient`);
       } else {
+        setSubmissionStatus("failure");
         console.error("Failed to delete patient");
       }
     } catch (error) {
+      setSubmissionStatus("failure");
       console.error("Error deleting patient:", error);
     }
   };
@@ -180,6 +184,17 @@ const PatientDetails = () => {
               <FontAwesomeIcon icon={faTrash} className="mr-2" />
               Delete
             </button>
+            <SubmissionStatus
+              submissionStatus={submissionStatus}
+              submissionTextSuccess={
+                "Patient was successfully deleted from the Database."
+              }
+              submissionHeadlineSuccess={"Delete Successful!"}
+              submissionHeadlineFailure={"Delete Failed"}
+              submissionTextFailure={
+                "Patient could not be successfully deleted from the Database. Please check if all observations related to this patient are deleted."
+              }
+            />
           </div>
         }
         {/* Render other patient details */}

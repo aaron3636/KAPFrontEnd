@@ -6,14 +6,14 @@ import LogoutButton from "./LogoutButton";
 
 function Welcome() {
   const { isAuthenticated } = useAuth0();
-  
+
   return (
     <div className="welcome-screen">
       <h1 className="welcome-screen-title">
         Welcome to the Patients Management System
       </h1>
-      {isAuthenticated ? 
-        (<div className="welcome-screen-options "> 
+      {isAuthenticated ? (
+        <div className="welcome-screen-options ">
           <Link to="/patient" className="welcome-screen-option search">
             <span className="welcome-screen-option-icon">🔍</span>
             <span className="welcome-screen-option-text">
@@ -22,13 +22,15 @@ function Welcome() {
           </Link>
           <Link to="/add" className="welcome-screen-option add">
             <span className="welcome-screen-option-icon">➕</span>
-            <span className="welcome-screen-option-text">Add a New Patient</span>
+            <span className="welcome-screen-option-text">
+              Add a New Patient
+            </span>
           </Link>
-          <LogoutButton /> 
-          </div>
-        ) : ( 
-          <LoginButton /> 
-        )}
+          <LogoutButton />
+        </div>
+      ) : (
+        <LoginButton />
+      )}
       {/* Add other Links if needed */}
     </div>
   );

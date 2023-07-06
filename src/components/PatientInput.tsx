@@ -441,10 +441,10 @@ const PatientForm: React.FC = () => {
 
         <SubmissionStatus
           submissionStatus={submissionStatus}
-          submissionTextSucess={
+          submissionTextSuccess={
             "Patient was successfully added to the Database."
           }
-          submissionHeadlineSucess={"Submission successful!"}
+          submissionHeadlineSuccess={"Submission successful!"}
           submissionHeadlineFailure={"Submission failed. Please try again."}
           submissionTextFailure={
             "Patient could not be successfully added to the Database."

@@ -25,46 +25,65 @@ const ObservationDetails = () => {
     fetchObservation();
   }, [observationId]);
 
+  /**
+   * Fetches the Observation data and associated Media based on the given observationId.
+   */
   const fetchObservation = async () => {
     try {
-      console.log(`http://localhost:8080/fhir/Observation/${observationId}`);
+      // Fetch the Observation data
       const response = await fetch(
         `http://localhost:8080/fhir/Observation/${observationId}`
       );
-      const observationData = await response.json();
 
-      console.log(observationData);
-      setObservation(observationData);
+      // Check if the fetch request was successful
+      if (response.ok) {
+        // Parse the response JSON to get the Observation data
+        const observationData = await response.json();
 
-      const media_array: fhirR4.Media[] = [];
+        // Set the Observation state
+        setObservation(observationData);
 
-      if (observationData) {
-        const array_derivedFrom = observationData.derivedFrom;
+        // Create an array to store the associated Media
+        const mediaArray: fhirR4.Media[] = [];
 
-        console.log(array_derivedFrom);
-        if (array_derivedFrom) {
-          for (let i = 0; i < array_derivedFrom.length; ++i) {
+        // Check if the Observation has derivedFrom references
+        if (observationData && observationData.derivedFrom) {
+          // Iterate over each derivedFrom reference
+          for (const derivedFrom of observationData.derivedFrom) {
             try {
+              // Fetch the Media data based on the derivedFrom identifier
               const responseMedia = await fetch(
-                `http://localhost:8080/fhir/Media?identifier=${array_derivedFrom[i].identifier?.value}`
+                `http://localhost:8080/fhir/Media?identifier=${derivedFrom.identifier?.value}`
               );
 
-              const dataMedia = await responseMedia.json();
-              const mediaData = dataMedia.entry.map(
-                (entry: BundleEntry) => entry.resource
-              );
+              // Check if the fetch request for Media was successful
+              if (responseMedia.ok) {
+                // Parse the response JSON to get the Media data
+                const dataMedia = await responseMedia.json();
 
-              media_array.push(mediaData[0]);
-              console.log(mediaData);
+                // Get the first Media resource from the response
+                const mediaData = dataMedia.entry.map(
+                  (entry: BundleEntry) => entry.resource
+                );
+
+                // Add the Media to the array if it exists
+                if (mediaData.length > 0) {
+                  mediaArray.push(mediaData[0]);
+                }
+              } else {
+                console.error("Failed to fetch Media:", responseMedia.status);
+              }
             } catch (error) {
               console.error("Error fetching Media:", error);
             }
           }
         }
-      }
 
-      console.log(media_array);
-      setMedia(media_array);
+        // Set the Media state
+        setMedia(mediaArray);
+      } else {
+        console.error("Failed to fetch Observation:", response.status);
+      }
     } catch (error) {
       console.error("Error fetching Observation:", error);
     }
@@ -113,23 +132,59 @@ const ObservationDetails = () => {
     }
   };
 
-  // Function to handle DELETE
-
+  /**
+   * Function to handle the deletion of an Observation and its associated Media.
+   */
   const handleDelete = async () => {
     try {
+      // Fetch the Observation data to get the derivedFrom references
       const response = await fetch(
-        `http://localhost:8080/fhir/Observation/${observationId}`,
-        {
-          method: "DELETE",
-        }
+        `http://localhost:8080/fhir/Observation/${observationId}`
       );
+
+      // Check if the fetch request for Observation was successful
       if (response.ok) {
-        navigate(`/patient`);
+        // Parse the response JSON to get the Observation data
+        const observationData = await response.json();
+
+        // Delete the associated Media (derivedFrom) if it exists
+        if (observationData && observationData.derivedFrom) {
+          // Iterate over each derivedFrom reference
+          for (const derivedFrom of observationData.derivedFrom) {
+            try {
+              // Delete the Media based on the derivedFrom reference
+              await fetch(
+                `http://localhost:8080/fhir/Media/${derivedFrom.reference}`,
+                {
+                  method: "DELETE",
+                }
+              );
+            } catch (error) {
+              console.error("Error deleting Media:", error);
+            }
+          }
+        }
+
+        // Delete the Observation
+        const deleteResponse = await fetch(
+          `http://localhost:8080/fhir/Observation/${observationId}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        // Check if the delete request for Observation was successful
+        if (deleteResponse.ok) {
+          // Navigate to the desired page after successful deletion
+          navigate(`/observations/:patientId`);
+        } else {
+          console.error("Failed to delete Observation:", deleteResponse.status);
+        }
       } else {
-        console.error("Failed to delete patient");
+        console.error("Failed to fetch Observation:", response.status);
       }
     } catch (error) {
-      console.error("Error deleting patient:", error);
+      console.error("Error deleting Observation:", error);
     }
   };
 

@@ -55,7 +55,7 @@ const Observations = () => {
         `http://localhost:8080/fhir/Observation?subject=${patientId}&_count=${mediaPerPage}&_offset=${offsetMediaPerPage}`
       );
       const data = await response.json();
-      const patientsData = data.entry.map(
+      const patientsData = data?.entry?.map(
         (entry: BundleEntry) => entry.resource
       );
 
