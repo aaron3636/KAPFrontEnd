@@ -62,7 +62,7 @@ const Observations = () => {
         }
       });
       const data = await response.json();
-      const patientsData = data.entry.map(
+      const patientsData = data?.entry?.map(
         (entry: BundleEntry) => entry.resource
       );
 

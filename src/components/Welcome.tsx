@@ -29,16 +29,18 @@ function Welcome() {
           </Link>
           <Link to="/add" className="welcome-screen-option add">
             <span className="welcome-screen-option-icon">➕</span>
-            <span className="welcome-screen-option-text">Add a New Patient</span>
+            <span className="welcome-screen-option-text">
+              Add a New Patient
+            </span>
           </Link>
-          <LogoutButton /> 
-          </div>
-        ) : ( 
-          <LoginButton /> 
-        )}
-     
+          <LogoutButton />
+        </div>
+      ) : (
+        <LoginButton />
+      )}
+      {/* Add other Links if needed */}
     </div>
   );
 }
 
-export default Welcome; 
+export default Welcome;

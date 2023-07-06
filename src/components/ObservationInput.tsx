@@ -460,10 +460,10 @@ const ObservationInput: React.FC = () => {
 
         <SubmissionStatus
           submissionStatus={submissionStatus}
-          submissionTextSucess={
+          submissionTextSuccess={
             "Observation was successfully added to the Database."
           }
-          submissionHeadlineSucess={"Submission successful!"}
+          submissionHeadlineSuccess={"Submission successful!"}
           submissionHeadlineFailure={"Submission failed. Please try again."}
           submissionTextFailure={
             "Observation could not be successfully added to the Database."
