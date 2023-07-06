@@ -326,12 +326,12 @@ export const generatePatientAddress = (patient: fhirR4.Patient) => {
  * POST
  */
 
-export const post = async (url: string, data: any) => {
+export const post = async (url: string, data: any, headers: any) => {
   try {
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        ...headers
       },
       body: JSON.stringify(data),
     });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fhirR4 } from "@smile-cdr/fhirts";
 import BundleEntry from "./BundleEntry";
+import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 import {
   filterResources,
@@ -12,6 +13,7 @@ import HomeButton from "./HomeButton";
 
 const PatientList: React.FC = () => {
   // State variables
+  const { getAccessTokenSilently } = useAuth0();
   const [patients, setPatients] = useState<fhirR4.Patient[]>([]);
   const [searchText, setSearchText] = useState("");
   const [filterAttribute, setFilterAttribute] = useState("name");
@@ -23,17 +25,24 @@ const PatientList: React.FC = () => {
   // Fetch patients when the component mounts
   useEffect(() => {
     fetchPatients();
-  }, [patientsPerPage, offsetPatientsPerPage]);
+  }, [patientsPerPage, offsetPatientsPerPage, getAccessTokenSilently]);
 
   // Fetch patients from the Server
   const fetchPatients = async () => {
+    const token = await getAccessTokenSilently(); 
     try {
       const response = await fetch(
         "http://localhost:8080/fhir/Patient?_count=" +
           patientsPerPage +
           "&_offset=" +
-          offsetPatientsPerPage
+          offsetPatientsPerPage, 
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       ); // Replace with your API endpoint
+
       console.log(
         "http://localhost:8080/fhir/Patient?_count=" +
           patientsPerPage +

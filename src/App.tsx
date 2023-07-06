@@ -7,36 +7,30 @@ import Welcome from "./components/Welcome";
 import PatientDetails from "./components/PatientDetails";
 import ObservationInput from "./components/ObservationInput";
 import ObservationDetails from "./components/ObservationDetails";
-import { useAuth0 } from "@auth0/auth0-react";
 import Observations from "./components/ObservationList";
+import { AuthenticationGuard } from "./components/AuthenticationGuard";
 
 function App() {
-  const { isAuthenticated } = useAuth0();
 
   return (
     <Router>
       <div className="min-h-screen flex flex-col">
-        {isAuthenticated ? (
           <Routes>
-            <Route path="/" element={<Welcome />} />
-            <Route path="/patient" element={<PatientList />} />
-            <Route path="/add" element={<PatientForm />} />
-            <Route path="/patient/:patientId" element={<PatientDetails />} />
-            <Route path="/observations/:patientId" element={<Observations />} />
+            <Route path="/" element={<Welcome/>} />
+            <Route path="/patient" element={<AuthenticationGuard component={PatientList}/>} />
+            <Route path="/add" element={<AuthenticationGuard component={PatientForm}/>} />
+            <Route path="/patient/:patientId" element={<AuthenticationGuard component={PatientDetails}/>} />
+            <Route path="/observations/:patientId" element={<AuthenticationGuard component={Observations}/>} />
             <Route
               path="/observations/addObservation/:patientId"
-              element={<ObservationInput />}
+              element={<AuthenticationGuard component={ObservationInput}/>}
             />
             <Route
               path="/observation/:observationId"
-              element={<ObservationDetails />}
+              element={<AuthenticationGuard component={ObservationDetails}/>}
             />
           </Routes>
-        ) : (
-          <Routes>
-            <Route path="/" element={<Welcome />} />
-          </Routes>
-        )}
+     
       </div>
     </Router>
   );

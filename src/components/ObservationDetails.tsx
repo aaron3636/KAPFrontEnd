@@ -8,12 +8,13 @@ import { faEdit, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import EditObservationForm from "./EditObservationForm";
 import BundleEntry from "./BundleEntry";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const ObservationDetails = () => {
   const { observationId } = useParams();
   const [observation, setObservation] = useState<fhirR4.Observation>();
   const [media, setMedia] = useState<fhirR4.Media[]>([]);
-
+  const { getAccessTokenSilently } = useAuth0();
   const [isEditMode, setIsEditMode] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [editedObservation, setEditedObservation] =
@@ -23,13 +24,17 @@ const ObservationDetails = () => {
 
   useEffect(() => {
     fetchObservation();
-  }, [observationId]);
+  }, [observationId, getAccessTokenSilently]);
 
   const fetchObservation = async () => {
     try {
-      console.log(`http://localhost:8080/fhir/Observation/${observationId}`);
+      const token = await getAccessTokenSilently();
       const response = await fetch(
-        `http://localhost:8080/fhir/Observation/${observationId}`
+        `http://localhost:8080/fhir/Observation/${observationId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
       );
       const observationData = await response.json();
 
@@ -46,7 +51,12 @@ const ObservationDetails = () => {
           for (let i = 0; i < array_derivedFrom.length; ++i) {
             try {
               const responseMedia = await fetch(
-                `http://localhost:8080/fhir/Media?identifier=${array_derivedFrom[i].identifier?.value}`
+                `http://localhost:8080/fhir/Media?identifier=${array_derivedFrom[i].identifier?.value}`, 
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  }
+                }
               );
 
               const dataMedia = await responseMedia.json();
@@ -91,11 +101,13 @@ const ObservationDetails = () => {
   ) => {
     event.preventDefault();
     try {
+      const token = await getAccessTokenSilently();
       const response = await fetch(
         `http://localhost:8080/fhir/Observation/${observationId}`,
         {
           method: "PUT",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(editedObservation),
@@ -117,10 +129,14 @@ const ObservationDetails = () => {
 
   const handleDelete = async () => {
     try {
+      const token = await getAccessTokenSilently();
       const response = await fetch(
         `http://localhost:8080/fhir/Observation/${observationId}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
       );
       if (response.ok) {

@@ -4,14 +4,21 @@ import { useAuth0 } from "@auth0/auth0-react";
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
 
+
 function Welcome() {
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+
+  async function accessToken() {
+    const token = await getAccessTokenSilently(); 
+    console.log(token);
+  }
   
   return (
     <div className="welcome-screen">
       <h1 className="welcome-screen-title">
         Welcome to the Patients Management System
       </h1>
+      <button onClick={accessToken}> Click me "Open console and see the jwt token for Postman" </button>
       {isAuthenticated ? 
         (<div className="welcome-screen-options "> 
           <Link to="/patient" className="welcome-screen-option search">
@@ -29,9 +36,9 @@ function Welcome() {
         ) : ( 
           <LoginButton /> 
         )}
-      {/* Add other Links if needed */}
+     
     </div>
   );
 }
 
-export default Welcome;
+export default Welcome; 

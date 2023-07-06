@@ -4,12 +4,14 @@ import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import HomeButton from "./HomeButton";
 import SubmissionStatus from "./SubmissonStatus";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const ObservationInput: React.FC = () => {
   // State variables
   const { patientId } = useParams();
   const [selectedFiles, setSelectedFiles] = useState<string[] | null>(null);
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
+  const { getAccessTokenSilently } = useAuth0();
 
   /**
    * Handles the form submission event.
@@ -17,7 +19,7 @@ const ObservationInput: React.FC = () => {
    * POST to "http://localhost:8080/fhir/Media"
    * @param e - The form submission event.
    */
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Create a new identifier for the Media
@@ -114,6 +116,8 @@ const ObservationInput: React.FC = () => {
     ).value;
     note.time = dateTime;
 
+    const token = await getAccessTokenSilently();
+
     if (selectedFiles) {
       const derivedFrom: fhirR4.Reference[] = [];
 
@@ -160,9 +164,12 @@ const ObservationInput: React.FC = () => {
         derivedFrom.push(referenceMedia);
 
         console.log(JSON.stringify(media));
+
+        
         fetch("http://localhost:8080/fhir/Media", {
           method: "POST",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(media),
@@ -203,6 +210,7 @@ const ObservationInput: React.FC = () => {
       fetch("http://localhost:8080/fhir/Observation", {
         method: "POST",
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(observation),

@@ -4,6 +4,7 @@ import { fhirR4 } from "@smile-cdr/fhirts";
 import { filterResources, sortResources } from "./utils";
 import { useNavigate } from "react-router-dom";
 import BundleEntry from "./BundleEntry";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Observations = () => {
   const { patientId } = useParams();
@@ -13,12 +14,13 @@ const Observations = () => {
   const [sortAttribute, setSortAttribute] = useState("");
   const [mediaPerPage, setMediaPerPage] = useState(20);
   const [offsetMediaPerPage, setoffsetMediaPerPage] = useState(0);
+  const { getAccessTokenSilently } = useAuth0();
 
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchObservation();
-  }, [patientId, mediaPerPage, offsetMediaPerPage]);
+  }, [patientId, mediaPerPage, offsetMediaPerPage, getAccessTokenSilently]);
 
   const handleClickAddObservation = async (patientId: string | undefined) => {
     if (patientId) {
@@ -50,10 +52,15 @@ const Observations = () => {
     setSortAttribute(event.target.value);
   };
   const fetchObservation = async () => {
+    const token = await getAccessTokenSilently();
     try {
       const response = await fetch(
-        `http://localhost:8080/fhir/Observation?subject=${patientId}&_count=${mediaPerPage}&_offset=${offsetMediaPerPage}`
-      );
+        `http://localhost:8080/fhir/Observation?subject=${patientId}&_count=${mediaPerPage}&_offset=${offsetMediaPerPage}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       const data = await response.json();
       const patientsData = data.entry.map(
         (entry: BundleEntry) => entry.resource

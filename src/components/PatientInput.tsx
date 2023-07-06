@@ -4,11 +4,13 @@ import { v4 as uuidv4 } from "uuid";
 import HomeButton from "./HomeButton";
 import SubmissionStatus from "./SubmissonStatus";
 import { post } from "./utils";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const PatientForm: React.FC = () => {
   // State variables
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
+  const { getAccessTokenSilently } = useAuth0();
 
   /**
    * Handles the form submission event.
@@ -148,8 +150,13 @@ const PatientForm: React.FC = () => {
       resourceType: "Patient",
     };
 
-    const submitPatientData = (patientData: fhirR4.Patient) => {
-      post("http://localhost:8080/fhir/Patient", patientData)
+    const submitPatientData = async (patientData: fhirR4.Patient) => {   
+      const token = await getAccessTokenSilently(); 
+      const headers = {
+        Authorization: `Bearer ${token}`, // Replace <your_token_here> with your actual token
+        'Content-Type': 'application/json'
+      };
+      post("http://localhost:8080/fhir/Patient", patientData, headers)
         .then((response) => {
           // Handle the response from the API
           console.log("Response from API:", response);

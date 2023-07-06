@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import EditPatientForm from "./EditPatientForm";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const PatientDetails = () => {
   const { patientId } = useParams();
@@ -15,18 +16,26 @@ const PatientDetails = () => {
   const [editedPatient, setEditedPatient] = useState<fhirR4.Patient>(
     {} as fhirR4.Patient
   );
+  const { getAccessTokenSilently } = useAuth0();
 
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchPatient();
-  }, [patientId]);
+  }, [patientId, getAccessTokenSilently]);
 
   const fetchPatient = async () => {
+    const token = await getAccessTokenSilently(); 
     try {
       const response = await fetch(
-        `http://localhost:8080/fhir/Patient/${patientId}`
-      );
+        `http://localhost:8080/fhir/Patient/${patientId}`,
+ 
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
       const data = await response.json();
       //console.log(data);
       setPatient(data);
@@ -57,12 +66,14 @@ const PatientDetails = () => {
     editedPatient: fhirR4.Patient
   ) => {
     event.preventDefault();
+    const token = await getAccessTokenSilently(); 
     try {
       const response = await fetch(
         `http://localhost:8080/fhir/Patient/${patientId}`,
         {
           method: "PUT",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(editedPatient),
@@ -81,11 +92,15 @@ const PatientDetails = () => {
 
   // Function to handle DELETE
   const handleDelete = async () => {
+    const token = await getAccessTokenSilently(); 
     try {
       const response = await fetch(
         `http://localhost:8080/fhir/Patient/${patientId}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       if (response.ok) {
