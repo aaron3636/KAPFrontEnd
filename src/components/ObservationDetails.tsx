@@ -1,14 +1,14 @@
 import { useState, useEffect, FormEvent } from "react";
 import { useParams } from "react-router-dom";
 import { fhirR4 } from "@smile-cdr/fhirts";
-import { RenderObservationPhotos } from "./utils";
-import HomeButton from "./HomeButton";
+import { RenderObservations } from "./utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import EditObservationForm from "./EditObservationForm";
 import BundleEntry from "./BundleEntry";
 import { useAuth0 } from "@auth0/auth0-react";
+import Banner from "./Banner";
 
 const ObservationDetails = () => {
   const { observationId } = useParams();
@@ -33,10 +33,11 @@ const ObservationDetails = () => {
     try {
       const token = await getAccessTokenSilently();
       const response = await fetch(
-        `http://localhost:8080/fhir/Observation/${observationId}`, {
+        `http://localhost:8080/fhir/Observation/${observationId}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
-          }
+          },
         }
       );
 
@@ -58,11 +59,11 @@ const ObservationDetails = () => {
             try {
               // Fetch the Media data based on the derivedFrom identifier
               const responseMedia = await fetch(
-                `http://localhost:8080/fhir/Media?identifier=${derivedFrom.identifier?.value}`, 
+                `http://localhost:8080/fhir/Media?identifier=${derivedFrom.identifier?.value}`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
-                  }
+                  },
                 }
               );
 
@@ -155,8 +156,8 @@ const ObservationDetails = () => {
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -261,7 +262,7 @@ const ObservationDetails = () => {
         </div>
         <div className="mt-4">
           <span className="font-semibold">Attachments:</span>{" "}
-          <RenderObservationPhotos media={media}></RenderObservationPhotos>
+          {<RenderObservations media={media}></RenderObservations>}
         </div>
         {
           <div className="flex justify-center mt-4">
@@ -287,14 +288,7 @@ const ObservationDetails = () => {
 
   return (
     <div>
-      <div>
-        <HomeButton />
-      </div>
-      <div className="flex justify-center h-auto p-10 bg-sky-800 text-4xl text-white mb-10 overflow-x-auto">
-        <div className="max-w-full md:max-w-[80%] lg:max-w-[70%]">
-          {"Observation " + observation?.id}
-        </div>
-      </div>
+      <Banner>{"Observation " + observation?.id}</Banner>
       <div className="flex justify-center">{renderObservationDetails()}</div>
     </div>
   );

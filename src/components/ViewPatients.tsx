@@ -9,7 +9,7 @@ import {
   renderPatientPhotos,
   generatePatientAddress,
 } from "./utils";
-import HomeButton from "./HomeButton";
+import Banner from "./Banner";
 
 const PatientList: React.FC = () => {
   // State variables
@@ -17,7 +17,7 @@ const PatientList: React.FC = () => {
   const [patients, setPatients] = useState<fhirR4.Patient[]>([]);
   const [searchText, setSearchText] = useState("");
   const [filterAttribute, setFilterAttribute] = useState("name");
-  const [sortAttribute, setSortAttribute] = useState("");
+  const [sortAttribute, setSortAttribute] = useState("creationDate");
   const [patientsPerPage, setpatientsPerPage] = useState(20);
   const [offsetPatientsPerPage, setoffsetPatientsPerPage] = useState(0);
   const navigate = useNavigate();
@@ -29,17 +29,17 @@ const PatientList: React.FC = () => {
 
   // Fetch patients from the Server
   const fetchPatients = async () => {
-    const token = await getAccessTokenSilently(); 
+    const token = await getAccessTokenSilently();
     try {
       const response = await fetch(
         "http://localhost:8080/fhir/Patient?_count=" +
           patientsPerPage +
           "&_offset=" +
-          offsetPatientsPerPage, 
+          offsetPatientsPerPage,
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       ); // Replace with your API endpoint
 
@@ -124,16 +124,7 @@ const PatientList: React.FC = () => {
 
   return (
     <div>
-      <div>
-        <HomeButton />
-      </div>
-
-      <div className="flex justify-center h-auto p-10 bg-sky-800 text-4xl text-white mb-10 overflow-x-auto">
-        <div className="max-w-full md:max-w-[80%] lg:max-w-[70%]">
-          What are you looking for?
-        </div>
-      </div>
-
+      <Banner>What are you looking for?</Banner>
       <div>
         <div className="flex flex-wrap items-center mb-4 font-mono md:font-mono text-lg/5 md:text-lg/5 justify-center">
           <select
@@ -157,6 +148,7 @@ const PatientList: React.FC = () => {
             <option value="name">Name</option>
             <option value="family">Family Name</option>
             <option value="birthDate">Birth Date</option>
+            <option value="creationDate">Creation Date</option>
             {/* Add options for other attributes */}
           </select>
           <input
@@ -302,7 +294,7 @@ const PatientList: React.FC = () => {
                   {generatePatientAddress(patient)}
                 </td>
                 <td className="p-4 flex justify-center font-mono md:font-mono text-lg/5 md:text-lg/5 h-auto max-w-sm hover:shadow-lg dark:shadow-black/30">
-                  {renderPatientPhotos(patient)}
+                  {renderPatientPhotos(patient, "50px", "50px")}
                 </td>
               </tr>
             ))}

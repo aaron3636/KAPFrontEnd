@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { fhirR4 } from "@smile-cdr/fhirts";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import HomeButton from "./HomeButton";
 import SubmissionStatus from "./SubmissonStatus";
 import { useAuth0 } from "@auth0/auth0-react";
+import Banner from "./Banner";
 
 const ObservationInput: React.FC = () => {
   // State variables
@@ -165,7 +165,6 @@ const ObservationInput: React.FC = () => {
 
         console.log(JSON.stringify(media));
 
-        
         fetch("http://localhost:8080/fhir/Media", {
           method: "POST",
           headers: {
@@ -273,12 +272,7 @@ const ObservationInput: React.FC = () => {
 
   return (
     <div>
-      <div>
-        <HomeButton />
-      </div>
-      <div className="flex justify-center p-10 bg-sky-800 text-4xl text-white mb-10">
-        Enter new Observation
-      </div>
+      <Banner>Enter new Observation</Banner>
       <form
         className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3"
         onSubmit={handleSubmit}

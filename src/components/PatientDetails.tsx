@@ -2,14 +2,13 @@ import { useState, useEffect, FormEvent } from "react";
 import { useParams } from "react-router-dom";
 import { fhirR4 } from "@smile-cdr/fhirts";
 import { renderPatientPhotos, generatePatientAddress } from "./utils";
-import HomeButton from "./HomeButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import EditPatientForm from "./EditPatientForm";
 import { useAuth0 } from "@auth0/auth0-react";
 import SubmissionStatus from "./SubmissonStatus";
-
+import Banner from "./Banner";
 
 const PatientDetails = () => {
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
@@ -28,16 +27,17 @@ const PatientDetails = () => {
   }, [patientId, getAccessTokenSilently]);
 
   const fetchPatient = async () => {
-    const token = await getAccessTokenSilently(); 
+    const token = await getAccessTokenSilently();
     try {
       const response = await fetch(
         `http://localhost:8080/fhir/Patient/${patientId}`,
- 
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
+
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
 
       const data = await response.json();
       //console.log(data);
@@ -69,7 +69,7 @@ const PatientDetails = () => {
     editedPatient: fhirR4.Patient
   ) => {
     event.preventDefault();
-    const token = await getAccessTokenSilently(); 
+    const token = await getAccessTokenSilently();
     try {
       const response = await fetch(
         `http://localhost:8080/fhir/Patient/${patientId}`,
@@ -95,7 +95,7 @@ const PatientDetails = () => {
 
   // Function to handle DELETE
   const handleDelete = async () => {
-    const token = await getAccessTokenSilently(); 
+    const token = await getAccessTokenSilently();
     try {
       const response = await fetch(
         `http://localhost:8080/fhir/Patient/${patientId}`,
@@ -180,40 +180,32 @@ const PatientDetails = () => {
             </p>
           </div>
         </div>
-        <div className="mt-4">
-          <span className="font-semibold">Attachments:</span>{" "}
-          {renderPatientPhotos(patient)}
+        <div className="mt-4 flex justify-center">
+          {renderPatientPhotos(patient, "300px", "300px")}
         </div>
-        {
-          <div className="flex justify-center mt-4">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={handleEdit}
-            >
-              <FontAwesomeIcon icon={faEdit} className="mr-2" />
-              Edit
-            </button>
-            <button
-              className="ml-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-              onClick={handleDelete}
-            >
-              <FontAwesomeIcon icon={faTrash} className="mr-2" />
-              Delete
-            </button>
-            <SubmissionStatus
-              submissionStatus={submissionStatus}
-              submissionTextSuccess={
-                "Patient was successfully deleted from the Database."
-              }
-              submissionHeadlineSuccess={"Delete Successful!"}
-              submissionHeadlineFailure={"Delete Failed"}
-              submissionTextFailure={
-                "Patient could not be successfully deleted from the Database. Please check if all observations related to this patient are deleted."
-              }
-            />
-          </div>
-        }
-        {/* Render other patient details */}
+        <div className="flex justify-center mt-4 space-x-4">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={handleEdit}
+          >
+            <FontAwesomeIcon icon={faEdit} className="mr-2" />
+            Edit
+          </button>
+          <button
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            onClick={handleDelete}
+          >
+            <FontAwesomeIcon icon={faTrash} className="mr-2" />
+            Delete
+          </button>
+          <SubmissionStatus
+            submissionStatus={submissionStatus}
+            submissionTextSuccess="Patient was successfully deleted from the Database."
+            submissionHeadlineSuccess="Delete Successful!"
+            submissionHeadlineFailure="Delete Failed"
+            submissionTextFailure="Patient could not be successfully deleted from the Database. Please check if all observations related to this patient are deleted."
+          />
+        </div>
       </div>
     );
   };
@@ -225,14 +217,9 @@ const PatientDetails = () => {
 
   return (
     <div>
-      <div>
-        <HomeButton />
-      </div>
-      <div className="flex justify-center h-auto p-10 bg-sky-800 text-4xl text-white mb-10 overflow-x-auto">
-        <div className="max-w-full md:max-w-[80%] lg:max-w-[70%]">
-          {patient?.name?.[0]?.given + " " + patient?.name?.[0]?.family}
-        </div>
-      </div>
+      <Banner>
+        {patient?.name?.[0]?.given + " " + patient?.name?.[0]?.family}
+      </Banner>
       <div className="flex items-center justify-center min-h-screen">
         {renderPatientDetails()}
       </div>
