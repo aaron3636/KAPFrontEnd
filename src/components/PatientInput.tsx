@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { fhirR4 } from "@smile-cdr/fhirts";
 import { v4 as uuidv4 } from "uuid";
-import HomeButton from "./HomeButton";
 import SubmissionStatus from "./SubmissonStatus";
 import { post } from "./utils";
 import { useAuth0 } from "@auth0/auth0-react";
+import Banner from "./Banner";
 
 const PatientForm: React.FC = () => {
   // State variables
@@ -150,11 +150,11 @@ const PatientForm: React.FC = () => {
       resourceType: "Patient",
     };
 
-    const submitPatientData = async (patientData: fhirR4.Patient) => {   
-      const token = await getAccessTokenSilently(); 
+    const submitPatientData = async (patientData: fhirR4.Patient) => {
+      const token = await getAccessTokenSilently();
       const headers = {
         Authorization: `Bearer ${token}`, // Replace <your_token_here> with your actual token
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       };
       post("http://localhost:8080/fhir/Patient", patientData, headers)
         .then((response) => {
@@ -206,12 +206,7 @@ const PatientForm: React.FC = () => {
 
   return (
     <div>
-      <div>
-        <HomeButton />
-      </div>
-      <div className="flex justify-center p-10 bg-sky-800 text-4xl text-white mb-10">
-        Enter new Patient
-      </div>
+      <Banner>Enter new Patient</Banner>
       <form
         className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3"
         onSubmit={handleSubmit}

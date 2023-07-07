@@ -96,6 +96,8 @@ export const sortResources = <T extends { [key: string]: any }>(
         return resource.name?.[0]?.family;
       case "birthDate":
         return resource.birthDate;
+      case "creationDate":
+        return resource.id;
       default:
         return undefined;
     }
@@ -122,7 +124,15 @@ export const sortResources = <T extends { [key: string]: any }>(
  * @returns {JSX.Element} - The rendered component.
  */
 
-const RenderPatientPhotos = ({ patient }: { patient: fhirR4.Patient }) => {
+const RenderPatientPhotos = ({
+  patient,
+  w,
+  h,
+}: {
+  patient: fhirR4.Patient;
+  w: string;
+  h: string;
+}) => {
   const [selectedPhoto, setSelectedPhoto] = useState<fhirR4.Attachment | null>(
     null
   );
@@ -147,6 +157,7 @@ const RenderPatientPhotos = ({ patient }: { patient: fhirR4.Patient }) => {
             src={`data:${photo.contentType};base64,${photo.data}`}
             alt="Patient Attachment"
             className="object-cover w-full h-full"
+            style={{ maxWidth: w, maxHeight: h }}
           />
         </div>
       ))}
@@ -164,6 +175,24 @@ const RenderPatientPhotos = ({ patient }: { patient: fhirR4.Patient }) => {
       )}
     </div>
   );
+};
+
+/**
+ * Renders the patient photos.
+ *
+ * @param {fhirR4.Patient} patient - The patient object containing photo information.
+ * @returns {JSX.Element | string} - JSX element representing the patient photos or a string indicating no attachment available.
+ */
+
+export const renderPatientPhotos = (
+  patient: fhirR4.Patient,
+  maxW: string,
+  maxH: string
+) => {
+  if (!patient.photo || patient.photo.length === 0) {
+    return "No attachment available";
+  }
+  return <RenderPatientPhotos patient={patient} w={maxW} h={maxH} />;
 };
 
 /**
@@ -220,11 +249,7 @@ const RenderObservationPhoto = ({ media }: { media: fhirR4.Media }) => {
  * @param {fhirR4.Patient} patient - The patient object containing photo information.
  * @returns {JSX.Element | string} - JSX element representing the patient photos or a string indicating no attachment available.
  */
-export const RenderObservationPhotos = ({
-  media,
-}: {
-  media: fhirR4.Media[];
-}) => {
+export const RenderObservations = ({ media }: { media: fhirR4.Media[] }) => {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number>(0);
 
   const handlePreviousClick = () => {
@@ -265,42 +290,6 @@ export const RenderObservationPhotos = ({
 };
 
 /**
- * Renders the patient photos.
- *
- * @param {fhirR4.Patient} patient - The patient object containing photo information.
- * @returns {JSX.Element | string} - JSX element representing the patient photos or a string indicating no attachment available.
- */
-
-export const renderPatientPhotos = (patient: fhirR4.Patient) => {
-  if (!patient.photo || patient.photo.length === 0) {
-    return "No attachment available";
-  }
-  return <RenderPatientPhotos patient={patient} />;
-};
-
-/**
- * @deprecated as it is causing performance issues.
- * Gets the cached photo URL or creates a new cache entry.
- *
- * @param {fhirR4.Attachment} photo - The photo object containing data and content type.
- * @returns {string} - The URL of the cached photo or an empty string if not available.
- */
-const getCachedPhotoUrl = (photo: fhirR4.Attachment) => {
-  if (!photo || !photo.data) return "";
-
-  const cacheKey = `${photo.id}-${photo.data}`;
-  const cachedImage = localStorage.getItem(cacheKey);
-
-  if (cachedImage) {
-    return cachedImage;
-  } else {
-    const image = `data:${photo.contentType};base64,${photo.data}`;
-    localStorage.setItem(cacheKey, image);
-    return image;
-  }
-};
-
-/**
  * Generates the patient address element based on the address data.
  *
  * @param patient - The FHIR R4 Patient resource.
@@ -329,10 +318,14 @@ export const generatePatientAddress = (patient: fhirR4.Patient) => {
   return "No address available";
 };
 
-/*
- * POST
+/**
+ * Sends a POST request to the specified URL with the provided data and headers.
+ *
+ * @param url - The URL to send the POST request to.
+ * @param data - The data to include in the request body.
+ * @param headers - Additional headers to include in the request.
+ * @returns A Promise that resolves to the JSON response if the request is successful, or throws an error if the request fails.
  */
-
 export const post = async (url: string, data: any, headers: any) => {
   try {
     const response = await fetch(url, {
