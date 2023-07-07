@@ -19,6 +19,9 @@ export function filterResources<T>(
   filterAttribute: string,
   searchText: string
 ): T[] {
+  if (!resources) {
+    return [];
+  }
   const filteredResources = resources.filter((resource: any) => {
     if (filterAttribute === "identifier") {
       return resource.identifier?.[0]?.value
@@ -54,7 +57,7 @@ export function filterResources<T>(
         ?.toLowerCase()
         .includes(searchText.toLowerCase());
     } else {
-      return null;
+      return [];
     }
   });
 
@@ -72,6 +75,9 @@ export const sortResources = <T extends { [key: string]: any }>(
   resources: T[],
   sortAttribute: string
 ) => {
+  if (!resources) {
+    return [];
+  }
   const getValue = (resource: T) => {
     switch (sortAttribute) {
       case "identifier":
@@ -138,7 +144,7 @@ const RenderPatientPhotos = ({ patient }: { patient: fhirR4.Patient }) => {
           onClick={() => handlePhotoClick(photo)}
         >
           <img
-            src={getCachedPhotoUrl(photo)}
+            src={`data:${photo.contentType};base64,${photo.data}`}
             alt="Patient Attachment"
             className="object-cover w-full h-full"
           />
@@ -150,7 +156,7 @@ const RenderPatientPhotos = ({ patient }: { patient: fhirR4.Patient }) => {
           onClick={() => setSelectedPhoto(null)}
         >
           <img
-            src={getCachedPhotoUrl(selectedPhoto)}
+            src={`data:${selectedPhoto.contentType};base64,${selectedPhoto.data}`}
             alt="Latest observation"
             className="max-w-full max-h-full"
           />
@@ -186,7 +192,7 @@ const RenderObservationPhoto = ({ media }: { media: fhirR4.Media }) => {
         onClick={() => handlePhotoClick(media.content)}
       >
         <img
-          src={getCachedPhotoUrl(media.content)}
+          src={`data:${media.content.contentType};base64,${media.content.data}`}
           alt="Patient Attachment"
           className="object-cover w-full h-full"
         />
@@ -198,7 +204,7 @@ const RenderObservationPhoto = ({ media }: { media: fhirR4.Media }) => {
           onClick={() => setSelectedPhoto(null)}
         >
           <img
-            src={getCachedPhotoUrl(selectedPhoto)}
+            src={`data:${selectedPhoto.contentType};base64,${selectedPhoto.data}`}
             alt="Latest observation"
             className="max-w-full max-h-full"
           />
@@ -271,13 +277,14 @@ export const renderPatientPhotos = (patient: fhirR4.Patient) => {
   }
   return <RenderPatientPhotos patient={patient} />;
 };
+
 /**
+ * @deprecated as it is causing performance issues.
  * Gets the cached photo URL or creates a new cache entry.
  *
  * @param {fhirR4.Attachment} photo - The photo object containing data and content type.
  * @returns {string} - The URL of the cached photo or an empty string if not available.
  */
-
 const getCachedPhotoUrl = (photo: fhirR4.Attachment) => {
   if (!photo || !photo.data) return "";
 
@@ -331,7 +338,7 @@ export const post = async (url: string, data: any, headers: any) => {
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        ...headers
+        ...headers,
       },
       body: JSON.stringify(data),
     });
