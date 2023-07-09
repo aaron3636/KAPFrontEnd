@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { fhirR4 } from "@smile-cdr/fhirts";
-import { filterResources, sortResources } from "./utils";
+import { filterResources, sortResources } from "../Utils/utils";
 import { useNavigate } from "react-router-dom";
-import BundleEntry from "./BundleEntry";
+import BundleEntry from "../Utils/BundleEntry";
 import { useAuth0 } from "@auth0/auth0-react";
-import Banner from "./Banner";
+import Banner from "../elements/Banner";
 
 const Observations = () => {
   const { patientId } = useParams();

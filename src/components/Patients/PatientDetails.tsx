@@ -1,14 +1,14 @@
 import { useState, useEffect, FormEvent } from "react";
 import { useParams } from "react-router-dom";
 import { fhirR4 } from "@smile-cdr/fhirts";
-import { renderPatientPhotos, generatePatientAddress } from "./utils";
+import { renderPatientPhotos, generatePatientAddress } from "../Utils/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import EditPatientForm from "./EditPatientForm";
 import { useAuth0 } from "@auth0/auth0-react";
-import SubmissionStatus from "./SubmissonStatus";
-import Banner from "./Banner";
+import SubmissionStatus from "../elements/SubmissonStatus";
+import Banner from "../elements/Banner";
 
 const PatientDetails = () => {
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);

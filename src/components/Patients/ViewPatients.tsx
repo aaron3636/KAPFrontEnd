@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { fhirR4 } from "@smile-cdr/fhirts";
-import BundleEntry from "./BundleEntry";
+import BundleEntry from "../Utils/BundleEntry";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -8,8 +8,8 @@ import {
   sortResources,
   renderPatientPhotos,
   generatePatientAddress,
-} from "./utils";
-import Banner from "./Banner";
+} from "../Utils/utils";
+import Banner from "../elements/Banner";
 
 const PatientList: React.FC = () => {
   // State variables

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { fhirR4 } from "@smile-cdr/fhirts";
 import { v4 as uuidv4 } from "uuid";
-import SubmissionStatus from "./SubmissonStatus";
-import { post } from "./utils";
+import SubmissionStatus from "../elements/SubmissonStatus";
+import { post } from "../Utils/utils";
 import { useAuth0 } from "@auth0/auth0-react";
-import Banner from "./Banner";
+import Banner from "../elements/Banner";
 
 const PatientForm: React.FC = () => {
   // State variables

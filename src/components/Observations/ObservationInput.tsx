@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { fhirR4 } from "@smile-cdr/fhirts";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import SubmissionStatus from "./SubmissonStatus";
+import SubmissionStatus from "../elements/SubmissonStatus";
 import { useAuth0 } from "@auth0/auth0-react";
-import Banner from "./Banner";
+import Banner from "../elements/Banner";
 
 const ObservationInput: React.FC = () => {
   // State variables
