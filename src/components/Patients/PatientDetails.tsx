@@ -142,24 +142,24 @@ const PatientDetails = () => {
               <span className="font-semibold">ID:</span> {patient.id}
             </p>
             <p className="text-sm mb-2">
-              <span className="font-semibold">Name:</span>{" "}
+              <span className="font-semibold">Name:</span>
               {patient.name?.[0]?.given}
             </p>
             <p className="text-sm mb-2">
-              <span className="font-semibold">Family Name:</span>{" "}
+              <span className="font-semibold">Family Name:</span>
               {patient.name?.[0]?.family}
             </p>
             <p className="text-sm mb-2">
               <span className="font-semibold">Gender:</span> {patient.gender}
             </p>
             <p className="text-sm mb-2">
-              <span className="font-semibold">Birthdate:</span>{" "}
+              <span className="font-semibold">Birthdate:</span>
               {patient.birthDate}
             </p>
           </div>
           <div>
             <p className="text-sm mb-2">
-              <span className="font-semibold">Phone:</span>{" "}
+              <span className="font-semibold">Phone:</span>
               {patient.telecom?.[0]?.value === undefined ? (
                 <span className="text-gray-400">None</span>
               ) : (
@@ -167,7 +167,7 @@ const PatientDetails = () => {
               )}
             </p>
             <p className="text-sm mb-2">
-              <span className="font-semibold">E-mail:</span>{" "}
+              <span className="font-semibold">E-mail:</span>
               {patient.telecom?.[1]?.value === undefined ? (
                 <span className="text-gray-400">None</span>
               ) : (
@@ -175,7 +175,7 @@ const PatientDetails = () => {
               )}
             </p>
             <p className="text-sm mb-2">
-              <span className="font-semibold">Address:</span>{" "}
+              <span className="font-semibold">Address:</span>
               {generatePatientAddress(patient)}
             </p>
           </div>

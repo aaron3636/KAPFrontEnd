@@ -347,6 +347,49 @@ export const post = async (url: string, data: any, headers: any) => {
   }
 };
 
+export const getDisplayTextForCode = (code: string): string => {
+  // Define a mapping of interpretation codes to display text
+  const interpretationMapping: Record<string, string> = {
+    H: "High",
+    L: "Low",
+    N: "Normal",
+    R: "Resistant",
+    S: "Susceptible",
+    U: "Unable to Determine",
+  };
+
+  // Check if the code exists in the mapping
+  if (interpretationMapping.hasOwnProperty(code)) {
+    return interpretationMapping[code];
+  }
+
+  // If the code is not found, return the code itself
+  return code;
+};
+
+export const displayReferenceRange = (
+  referenceRange: fhirR4.ObservationReferenceRange[] | undefined
+): string => {
+  if (!referenceRange || referenceRange.length === 0) {
+    return "-";
+  }
+
+  const lowValue = referenceRange[0].low?.value;
+  const lowUnit = referenceRange[0].low?.unit;
+  const lowCode = referenceRange[0].low?.code;
+  const highValue = referenceRange[0].high?.value;
+  const highUnit = referenceRange[0].high?.unit;
+  const highCode = referenceRange[0].high?.code;
+
+  if (lowValue && highValue && lowUnit && highUnit) {
+    const formattedLow = `${lowValue} ${lowUnit} (${lowCode})`;
+    const formattedHigh = `${highValue} ${highUnit} (${highCode})`;
+    return `${formattedLow} - ${formattedHigh}`;
+  }
+
+  return "";
+};
+
 /**
  * @deprecated Use `filterResources` instead.
  */

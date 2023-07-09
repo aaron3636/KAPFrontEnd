@@ -197,7 +197,7 @@ const ObservationInput: React.FC = () => {
         status: statusObservation,
         category: [observationCategory],
         code: newObservationCoding,
-        effectiveDateTime: dateTime,
+        issued: dateTime,
         derivedFrom: derivedFrom,
         subject: newPatientReference,
         resourceType: "Observation",

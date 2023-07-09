@@ -16,7 +16,6 @@ const ObservationDetails = () => {
   const [media, setMedia] = useState<fhirR4.Media[]>([]);
   const { getAccessTokenSilently } = useAuth0();
   const [isEditMode, setIsEditMode] = useState(false);
-  const [searchText, setSearchText] = useState("");
   const [editedObservation, setEditedObservation] =
     useState<fhirR4.Observation>({} as fhirR4.Observation);
 
