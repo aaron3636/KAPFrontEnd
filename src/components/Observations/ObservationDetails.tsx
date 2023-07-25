@@ -150,7 +150,49 @@ const ObservationDetails = () => {
   const handleDelete = async () => {
     try {
       const token = await getAccessTokenSilently();
+
+      // Fetch the Observation first
       const response = await fetch(
+        `http://localhost:8080/fhir/Observation/${observationId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Check if the fetch request for Observation was successful
+      if (!response.ok) {
+        console.error("Failed to fetch Observation:", response.status);
+        return;
+      }
+
+      // Parse the response JSON to get the Observation data
+      const observationData = await response.json();
+
+      // Delete the associated Media (derivedFrom) if it exists
+      if (observationData && observationData.derivedFrom) {
+        // Iterate over each derivedFrom reference
+        for (const derivedFrom of observationData.derivedFrom) {
+          try {
+            // Delete the Media based on the derivedFrom reference
+            await fetch(
+              `http://localhost:8080/fhir/Media/${derivedFrom.reference}`,
+              {
+                method: "DELETE",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+          } catch (error) {
+            console.error("Error deleting Media:", error);
+          }
+        }
+      }
+
+      // Delete the Observation
+      const deleteResponse = await fetch(
         `http://localhost:8080/fhir/Observation/${observationId}`,
         {
           method: "DELETE",
@@ -160,47 +202,14 @@ const ObservationDetails = () => {
         }
       );
 
-      // Check if the fetch request for Observation was successful
-      if (response.ok) {
-        // Parse the response JSON to get the Observation data
-        const observationData = await response.json();
-
-        // Delete the associated Media (derivedFrom) if it exists
-        if (observationData && observationData.derivedFrom) {
-          // Iterate over each derivedFrom reference
-          for (const derivedFrom of observationData.derivedFrom) {
-            try {
-              // Delete the Media based on the derivedFrom reference
-              await fetch(
-                `http://localhost:8080/fhir/Media/${derivedFrom.reference}`,
-                {
-                  method: "DELETE",
-                }
-              );
-            } catch (error) {
-              console.error("Error deleting Media:", error);
-            }
-          }
-        }
-
-        // Delete the Observation
-        const deleteResponse = await fetch(
-          `http://localhost:8080/fhir/Observation/${observationId}`,
-          {
-            method: "DELETE",
-          }
-        );
-
-        // Check if the delete request for Observation was successful
-        if (deleteResponse.ok) {
-          // Navigate to the desired page after successful deletion
-          navigate(`/observations/:patientId`);
-        } else {
-          console.error("Failed to delete Observation:", deleteResponse.status);
-        }
-      } else {
-        console.error("Failed to fetch Observation:", response.status);
+      // Check if the delete request for Observation was successful
+      if (!deleteResponse.ok) {
+        console.error("Failed to delete Observation:", deleteResponse.status);
+        return;
       }
+
+      // Navigate to the desired page after successful deletion
+      navigate(-1);
     } catch (error) {
       console.error("Error deleting Observation:", error);
     }
