@@ -9,6 +9,7 @@ import ObservationInput from "./components/Observations/ObservationInput";
 import ObservationDetails from "./components/Observations/ObservationDetails";
 import Observations from "./components/Observations/ObservationList";
 import { AuthenticationGuard } from "./components/Utils/AuthenticationGuard";
+import ObservationAll from "./components/Observations/ObservationAll";
 
 function App() {
   return (
@@ -19,6 +20,10 @@ function App() {
           <Route
             path="/patient"
             element={<AuthenticationGuard component={PatientList} />}
+          />
+          <Route
+            path="/observations"
+            element={<AuthenticationGuard component={ObservationAll} />}
           />
           <Route
             path="/add"
