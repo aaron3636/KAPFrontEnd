@@ -258,9 +258,9 @@ const Observations = () => {
                   {observation.bodySite?.text || "-"}
                 </td>
                 <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 border whitespace-nowrap">
-                  {observation.interpretation?.[0]?.coding?.[0]?.code
+                  {observation.interpretation?.[0]?.coding?.[0]?.display
                     ? getDisplayTextForCode(
-                        observation.interpretation?.[0]?.coding?.[0]?.code
+                        observation.interpretation?.[0]?.coding?.[0]?.display
                       )
                     : "-"}
                 </td>

@@ -326,23 +326,35 @@ export const generatePatientAddress = (patient: fhirR4.Patient) => {
  * @param headers - Additional headers to include in the request.
  * @returns A Promise that resolves to the JSON response if the request is successful, or throws an error if the request fails.
  */
-export const post = async (url: string, data: any, headers: any) => {
+export const post = async (
+  resource: string,
+  data: any,
+  token: string,
+  handleStatus: (status: "success" | "failure" | null) => void,
+  headers: any = {}
+) => {
   try {
+    const url = `http://localhost:8080/fhir/${resource}`;
     const response = await fetch(url, {
       method: "POST",
       headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
         ...headers,
       },
       body: JSON.stringify(data),
     });
 
     if (response.ok) {
-      return await response.json();
+      const responseData = await response.json();
+      handleStatus("success");
+      return responseData;
     } else {
-      throw new Error("Request failed");
+      throw new Error(`Request failed: ${response.statusText}`);
     }
   } catch (error) {
     console.error("Error:", error);
+    handleStatus("failure");
     throw error;
   }
 };
@@ -388,157 +400,4 @@ export const displayReferenceRange = (
   }
 
   return "";
-};
-
-/**
- * @deprecated Use `filterResources` instead.
- */
-export const filterPatients = (
-  patients: fhirR4.Patient[],
-  filterAttribute: string,
-  searchText: string
-) => {
-  const filteredPatients = patients.filter((patient) => {
-    if (filterAttribute === "name") {
-      return patient.name?.[0]?.given?.[0]
-        .toLowerCase()
-        .includes(searchText.toLowerCase());
-    } else if (filterAttribute === "family") {
-      return patient.name?.[0].family
-        ?.toLowerCase()
-        .includes(searchText.toLowerCase());
-    } else if (filterAttribute === "birthDate") {
-      return patient.birthDate
-        ?.toLowerCase()
-        .includes(searchText.toLowerCase());
-    } else if (filterAttribute === "identifier") {
-      return patient.identifier?.[0].value
-        ?.toString()
-        .toLowerCase()
-        .includes(searchText.toLowerCase());
-    } else {
-      return null;
-    }
-  });
-  return filteredPatients;
-};
-
-/**
- * @deprecated Use `filterResources` instead.
- */
-export const filterObservation = (
-  observations: fhirR4.Observation[],
-  filterAttribute: string,
-  searchText: string
-) => {
-  const filteredMedia = observations.filter((observation) => {
-    if (filterAttribute === "identifier") {
-      return observation.identifier?.[0]?.value
-        ?.toLowerCase()
-        .includes(searchText.toLowerCase());
-    } else if (filterAttribute === "status") {
-      return observation.status
-        ?.toLowerCase()
-        .includes(searchText.toLowerCase());
-    } else if (filterAttribute === "code") {
-      return observation.code?.coding?.[0]?.code
-        ?.toLowerCase()
-        .includes(searchText.toLowerCase());
-    } else if (filterAttribute === "dateTime") {
-      return observation.effectiveDateTime
-        ?.toString()
-        .toLowerCase()
-        .includes(searchText.toLowerCase());
-    } else if (filterAttribute === "bodySite") {
-      return observation.bodySite?.coding?.[0]?.code
-        ?.toString()
-        .toLowerCase()
-        .includes(searchText.toLowerCase());
-    } else {
-      return null;
-    }
-  });
-  return filteredMedia;
-};
-
-/**
- * @deprecated Use `sortResources` instead.
- */
-export const sortObservation = (
-  observations: fhirR4.Observation[],
-  sortAttribute: string
-) => {
-  const getValue = (observation: fhirR4.Observation) => {
-    switch (sortAttribute) {
-      case "identifier":
-        return observation.identifier?.[0].value;
-      case "status":
-        return observation.status;
-      case "code":
-        return observation.code?.coding?.[0]?.code;
-      case "dateTime":
-        return observation.effectiveDateTime;
-      case "bodySite":
-        return observation.bodySite?.coding?.[0]?.code;
-      // Add cases for other attributes you want to sort by
-      default:
-        return undefined;
-    }
-  };
-
-  return observations.sort(
-    (
-      observationOne: fhirR4.Observation,
-      observationTwo: fhirR4.Observation
-    ) => {
-      const imageOneValue = getValue(observationOne);
-      const imageTwoValue = getValue(observationTwo);
-
-      if (imageOneValue === undefined || imageTwoValue === undefined) {
-        return 0;
-      }
-
-      return imageOneValue.localeCompare(imageTwoValue);
-    }
-  );
-};
-
-/**
- * @deprecated Use `sortResources` instead.
- */
-export const sortPatients = (
-  patients: fhirR4.Patient[],
-  sortAttribute: string
-) => {
-  /**
-   * Gets the value of the specified attribute for a given patient.
-   * @param patient - The patient object.
-   * @returns The value of the attribute or undefined if not found.
-   */
-  const getValue = (patient: fhirR4.Patient) => {
-    switch (sortAttribute) {
-      case "name":
-        return patient.name?.[0]?.given?.[0];
-      case "birthDate":
-        return patient.birthDate;
-      case "family":
-        return patient.name?.[0]?.family;
-      // Add cases for other attributes you want to sort by
-      default:
-        return undefined;
-    }
-  };
-
-  return patients.sort(
-    (patientOne: fhirR4.Patient, patientTwo: fhirR4.Patient) => {
-      const patientOneValue = getValue(patientOne);
-      const patientTwoValue = getValue(patientTwo);
-
-      if (patientOneValue === undefined || patientTwoValue === undefined) {
-        return 0;
-      }
-
-      return patientOneValue.localeCompare(patientTwoValue);
-    }
-  );
 };

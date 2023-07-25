@@ -9,7 +9,9 @@ import Banner from "../elements/Banner";
 const PatientForm: React.FC = () => {
   // State variables
   const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
+  const [submissionStatus, setSubmissionStatus] = useState<
+    "success" | "failure" | null
+  >(null);
   const { getAccessTokenSilently } = useAuth0();
 
   /**
@@ -152,21 +154,13 @@ const PatientForm: React.FC = () => {
 
     const submitPatientData = async (patientData: fhirR4.Patient) => {
       const token = await getAccessTokenSilently();
-      const headers = {
-        Authorization: `Bearer ${token}`, // Replace <your_token_here> with your actual token
-        "Content-Type": "application/json",
-      };
-      post("http://localhost:8080/fhir/Patient", patientData, headers)
-        .then((response) => {
-          // Handle the response from the API
-          console.log("Response from API:", response);
-          setSubmissionStatus("success");
-        })
-        .catch((error) => {
-          // Handle any errors that occur during the request
-          console.error("Error:", error);
-          setSubmissionStatus("failure");
-        });
+
+      try {
+        await post("Patient", patientData, token, setSubmissionStatus);
+        setSubmissionStatus("success");
+      } catch (error) {
+        setSubmissionStatus("failure");
+      }
     };
 
     const handlePhotoUpload = (
