@@ -132,7 +132,7 @@ const EditPatientForm: React.FC<EditPatientFormProps> = ({
             Phone:
           </label>
           <input
-            type="number"
+            type="tel"
             id="phone"
             name="phone"
             value={editedPatient.telecom?.[0]?.value || ""}
@@ -141,7 +141,7 @@ const EditPatientForm: React.FC<EditPatientFormProps> = ({
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="mail" className="text-lg font-medium">
+          <label htmlFor="email" className="text-lg font-medium">
             E-Mail:
           </label>
           <input

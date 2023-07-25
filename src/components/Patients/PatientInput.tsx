@@ -5,6 +5,7 @@ import SubmissionStatus from "../elements/SubmissonStatus";
 import { post } from "../Utils/utils";
 import { useAuth0 } from "@auth0/auth0-react";
 import Banner from "../elements/Banner";
+import { FormField } from "../Utils/formComponents";
 
 const PatientForm: React.FC = () => {
   // State variables
@@ -201,252 +202,121 @@ const PatientForm: React.FC = () => {
   return (
     <div>
       <Banner>Enter new Patient</Banner>
-      <form
-        className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3"
-        onSubmit={handleSubmit}
-      >
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Given Name:
-            <input
-              className="rounded border-b-2"
-              type="text"
-              name="givenName"
-              required
-            />
-          </label>
-          <br />
-        </div>
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Family Name:
-            <input
-              className="rounded border-b-2"
-              type="text"
-              name="family"
-              required
-            />
-          </label>
-          <br />
-        </div>
-
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Title:
-            <select className="text-sm" name="title" defaultValue="">
-              <option value="" disabled>
-                Select Titel
-              </option>
-              <option value="Dr.">Dr.</option>
-              <option value="Prof.">Prof.</option>
-              <option value="">None</option>
-            </select>
-          </label>
-          <br />
-        </div>
-
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Identifier:
-            <input
-              className="rounded border-b-2"
-              type="text"
-              name="identifier"
-              required
-            />
-          </label>
-          <br />
-        </div>
-
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Gender:
-            <select className="rounded border-b-2" name="gender" required>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </label>
-          <br />
-        </div>
-
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Birthday:
-            <input
-              className="rounded border-b-2"
-              type="date"
-              name="birthday"
-              required
-            />
-          </label>
-          <br />
-        </div>
-
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Email:
-            <input
-              className="rounded border-b-2"
-              type="email"
-              name="email"
-              required
-            />
-          </label>
-          <br />
-        </div>
-
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Phone:
-            <input
-              className="rounded border-b-2"
-              type="tel"
-              name="phone"
-              required
-            />
-          </label>
-          <br />
-        </div>
-
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Street and Number:
-            <input
-              className="rounded border-b-2"
-              type="text"
-              name="street_number"
-              required
-            />
-          </label>
-          <br />
-        </div>
-
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            City:
-            <input
-              className="rounded border-b-2"
-              type="text"
-              name="city"
-              required
-            />
-          </label>
-          <br />
-        </div>
-
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Postal Code:
-            <input
-              className="rounded border-b-2"
-              type="text"
-              name="postalCode"
-              required
-            />
-          </label>
-          <br />
-        </div>
-
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            State:
-            <input
-              className="rounded border-b-2"
-              type="text"
-              name="state"
-              required
-            />
-          </label>
-          <br />
-        </div>
-
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Country:
-            <input
-              className="rounded border-b-2"
-              type="text"
-              name="country"
-              required
-            />
-          </label>
-          <br />
-        </div>
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Martial Status:
-            <select className="rounded border-b-2" name="martialStatus">
-              <option value="S">Single</option>
-              <option value="F">Divorced</option>
-              <option value="M">Married</option>
-              <option value="W">Widowed</option>
-              <option value="P">Polygamous</option>
-              <option value="unknown">unknown</option>
-            </select>
-          </label>
-          <br />
-        </div>
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Language:
-            <select className="rounded border-b-2" name="language" required>
-              <option value="de">German</option>
-              <option value="en">English</option>
-              <option value="fr">French</option>
-              <option value="es">Spanish</option>
-              <option value="it">Italian</option>
-              <option value="nl">Dutch</option>
-              <option value="no">Norwegian</option>
-              <option value="pt">Portuguese</option>
-              <option value="ru">Russian</option>
-              <option value="ar">Arabic</option>
-            </select>
-          </label>
-          <br />
-        </div>
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Photo:
-            <input type="file" accept="image/*" onChange={handlePhotoChange} />
-          </label>
-          <br />
-        </div>
-
-        <div className="p-3 font-mono md:font-mono text-lg/5 md:text-lg/5">
-          <label>
-            Active:
-            <input
-              className="rounded border-b-2"
-              type="checkbox"
-              name="active"
-              defaultChecked
-            />
-          </label>
-          <br />
-        </div>
-
-        <div className="justify-center flex-2">
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded object-center text-lg "
-            type="submit"
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="max-w-7xl mx-auto">
+          <form
+            className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3"
+            onSubmit={handleSubmit}
           >
-            Submit
-          </button>
+            <FormField
+              label="Given Name"
+              name="givenName"
+              type="text"
+              required
+            />
+            <FormField label="Family Name" name="family" type="text" required />
+            <FormField
+              label="Title"
+              name="title"
+              type="select"
+              options={[
+                { label: "Select Title", value: "", disabled: true },
+                { label: "Dr.", value: "Dr." },
+                { label: "Prof.", value: "Prof." },
+                { label: "None", value: "" },
+              ]}
+            />
+            <FormField
+              label="Identifier"
+              name="identifier"
+              type="text"
+              required
+            />
+            <FormField
+              label="Gender"
+              name="gender"
+              type="select"
+              required
+              options={[
+                { label: "Male", value: "male" },
+                { label: "Female", value: "female" },
+                { label: "Other", value: "other" },
+              ]}
+            />
+            <FormField label="Birthday" name="birthday" type="date" required />
+            <FormField label="Email" name="email" type="email" required />
+            <FormField label="Phone" name="phone" type="tel" required />
+            <FormField
+              label="Street and Number"
+              name="street_number"
+              type="text"
+              required
+            />
+            <FormField label="City" name="city" type="text" required />
+            <FormField
+              label="Postal Code"
+              name="postalCode"
+              type="text"
+              required
+            />
+            <FormField label="State" name="state" type="text" required />
+            <FormField label="Country" name="country" type="text" required />
+            <FormField
+              label="Marital Status"
+              name="maritalStatus"
+              type="select"
+              options={[
+                { label: "Single", value: "S" },
+                { label: "Divorced", value: "F" },
+                { label: "Married", value: "M" },
+                { label: "Widowed", value: "W" },
+                { label: "Polygamous", value: "P" },
+                { label: "Unknown", value: "unknown" },
+              ]}
+            />
+            <FormField
+              label="Language"
+              name="language"
+              type="select"
+              required
+              options={[
+                { label: "German", value: "de" },
+                { label: "English", value: "en" },
+                { label: "French", value: "fr" },
+                { label: "Spanish", value: "es" },
+                { label: "Italian", value: "it" },
+                { label: "Dutch", value: "nl" },
+                { label: "Norwegian", value: "no" },
+                { label: "Portuguese", value: "pt" },
+                { label: "Russian", value: "ru" },
+                { label: "Arabic", value: "ar" },
+              ]}
+            />
+            <FormField
+              label="Photo"
+              name="photo"
+              type="file"
+              handler={handlePhotoChange}
+            />
+            <FormField label="Active" name="active" type="checkbox" />
+            <div className="justify-center flex-2">
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded object-center text-lg "
+                type="submit"
+              >
+                Submit
+              </button>
+            </div>
+            <SubmissionStatus
+              submissionStatus={submissionStatus}
+              submissionTextSuccess="Patient was successfully added to the Database."
+              submissionHeadlineSuccess="Submission successful!"
+              submissionHeadlineFailure="Submission failed. Please try again."
+              submissionTextFailure="Patient could not be successfully added to the Database."
+            />
+          </form>
         </div>
-
-        <SubmissionStatus
-          submissionStatus={submissionStatus}
-          submissionTextSuccess={
-            "Patient was successfully added to the Database."
-          }
-          submissionHeadlineSuccess={"Submission successful!"}
-          submissionHeadlineFailure={"Submission failed. Please try again."}
-          submissionTextFailure={
-            "Patient could not be successfully added to the Database."
-          }
-        ></SubmissionStatus>
-      </form>
+      </div>
     </div>
   );
 };

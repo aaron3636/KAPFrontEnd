@@ -12,7 +12,7 @@ import BundleEntry from "../Utils/BundleEntry";
 import { useAuth0 } from "@auth0/auth0-react";
 import Banner from "../elements/Banner";
 
-const Observations = () => {
+const PatientObservationsList = () => {
   const { patientId } = useParams();
   const [media, setMedia] = useState<fhirR4.Observation[]>([]);
   const [searchText, setSearchText] = useState("");
@@ -283,4 +283,4 @@ const Observations = () => {
   );
 };
 
-export default Observations;
+export default PatientObservationsList;

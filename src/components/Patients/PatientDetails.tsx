@@ -134,79 +134,83 @@ const PatientDetails = () => {
     }
 
     return (
-      <div className="max-w-md mx-auto p-4 bg-white shadow-lg rounded-lg">
-        <h2 className="text-2xl font-bold mb-4">Patient Details</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm mb-2">
-              <span className="font-semibold">ID:</span> {patient.id}
-            </p>
-            <p className="text-sm mb-2">
-              <span className="font-semibold">Name:</span>
-              {patient.name?.[0]?.given}
-            </p>
-            <p className="text-sm mb-2">
-              <span className="font-semibold">Family Name:</span>
-              {patient.name?.[0]?.family}
-            </p>
-            <p className="text-sm mb-2">
-              <span className="font-semibold">Gender:</span> {patient.gender}
-            </p>
-            <p className="text-sm mb-2">
-              <span className="font-semibold">Birthdate:</span>
-              {patient.birthDate}
-            </p>
+      <section className="flex flex-col items-center justify-center py-12 bg-gray-50">
+        <article className="max-w-lg w-full bg-white shadow-md rounded-lg overflow-hidden">
+          <header className="px-6 py-4">
+            <h2 className="text-xl font-bold mb-2">Patient Details</h2>
+          </header>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 py-4">
+            <div>
+              <p className="text-sm mb-2">
+                <span className="font-semibold">ID:</span> {patient.id}
+              </p>
+              <p className="text-sm mb-2">
+                <span className="font-semibold">Name:</span>{" "}
+                {patient.name?.[0]?.given}
+              </p>
+              <p className="text-sm mb-2">
+                <span className="font-semibold">Family Name:</span>{" "}
+                {patient.name?.[0]?.family}
+              </p>
+              <p className="text-sm mb-2">
+                <span className="font-semibold">Gender:</span> {patient.gender}
+              </p>
+              <p className="text-sm mb-2">
+                <span className="font-semibold">Birthdate:</span>{" "}
+                {patient.birthDate}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm mb-2">
+                <span className="font-semibold">Phone:</span>
+                {patient.telecom?.[0]?.value === undefined ? (
+                  <span className="text-gray-400">None</span>
+                ) : (
+                  patient.telecom?.[0]?.value
+                )}
+              </p>
+              <p className="text-sm mb-2">
+                <span className="font-semibold">E-mail:</span>
+                {patient.telecom?.[1]?.value === undefined ? (
+                  <span className="text-gray-400">None</span>
+                ) : (
+                  patient.telecom?.[1]?.value
+                )}
+              </p>
+              <p className="text-sm mb-2">
+                <span className="font-semibold">Address:</span>{" "}
+                {generatePatientAddress(patient)}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm mb-2">
-              <span className="font-semibold">Phone:</span>
-              {patient.telecom?.[0]?.value === undefined ? (
-                <span className="text-gray-400">None</span>
-              ) : (
-                patient.telecom?.[0]?.value
-              )}
-            </p>
-            <p className="text-sm mb-2">
-              <span className="font-semibold">E-mail:</span>
-              {patient.telecom?.[1]?.value === undefined ? (
-                <span className="text-gray-400">None</span>
-              ) : (
-                patient.telecom?.[1]?.value
-              )}
-            </p>
-            <p className="text-sm mb-2">
-              <span className="font-semibold">Address:</span>
-              {generatePatientAddress(patient)}
-            </p>
-          </div>
-        </div>
-        <div className="mt-4 flex justify-center">
-          {renderPatientPhotos(patient, "300px", "300px")}
-        </div>
-        <div className="flex justify-center mt-4 space-x-4">
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={handleEdit}
-          >
-            <FontAwesomeIcon icon={faEdit} className="mr-2" />
-            Edit
-          </button>
-          <button
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            onClick={handleDelete}
-          >
-            <FontAwesomeIcon icon={faTrash} className="mr-2" />
-            Delete
-          </button>
-          <SubmissionStatus
-            submissionStatus={submissionStatus}
-            submissionTextSuccess="Patient was successfully deleted from the Database."
-            submissionHeadlineSuccess="Delete Successful!"
-            submissionHeadlineFailure="Delete Failed"
-            submissionTextFailure="Patient could not be successfully deleted from the Database. Please check if all observations related to this patient are deleted."
-          />
-        </div>
-      </div>
+          <figure className="flex justify-center mt-4 px-6 pb-4">
+            {renderPatientPhotos(patient, "200px", "200px")}
+          </figure>
+          <footer className="flex justify-evenly mt-4 p-4 bg-gray-50 border-t">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={handleEdit}
+            >
+              <FontAwesomeIcon icon={faEdit} className="mr-2" />
+              Edit
+            </button>
+            <button
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              onClick={handleDelete}
+            >
+              <FontAwesomeIcon icon={faTrash} className="mr-2" />
+              Delete
+            </button>
+            <SubmissionStatus
+              submissionStatus={submissionStatus}
+              submissionTextSuccess="Patient was successfully deleted from the Database."
+              submissionHeadlineSuccess="Delete Successful!"
+              submissionHeadlineFailure="Delete Failed"
+              submissionTextFailure="Patient could not be successfully deleted from the Database. Please check if all observations related to this patient are deleted."
+            />
+          </footer>
+        </article>
+      </section>
     );
   };
   const handleObservationsClick = (patientId: string | undefined) => {
@@ -216,22 +220,22 @@ const PatientDetails = () => {
   };
 
   return (
-    <div>
+    <section>
       <Banner>
         {patient?.name?.[0]?.given + " " + patient?.name?.[0]?.family}
       </Banner>
-      <div className="flex items-center justify-center min-h-screen">
+      <main className="flex items-center justify-center min-h-screen bg-gray-50">
         {renderPatientDetails()}
-      </div>
-      <div className="flex justify-center">
+      </main>
+      <footer className="flex justify-center p-4 bg-gray-100 border-t">
         <button
           onClick={() => handleObservationsClick(patient?.id)}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 m-4 rounded text-lg"
+          className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
         >
           Show Observations
         </button>
-      </div>
-    </div>
+      </footer>
+    </section>
   );
 };
 

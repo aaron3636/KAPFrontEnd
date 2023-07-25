@@ -7,7 +7,7 @@ import Welcome from "./components/Welcome";
 import PatientDetails from "./components/Patients/PatientDetails";
 import ObservationInput from "./components/Observations/ObservationInput";
 import ObservationDetails from "./components/Observations/ObservationDetails";
-import Observations from "./components/Observations/ObservationList";
+import PatientObservationsList from "./components/Observations/PatientObservationsList";
 import { AuthenticationGuard } from "./components/Utils/AuthenticationGuard";
 import ObservationAll from "./components/Observations/ObservationAll";
 
@@ -35,7 +35,9 @@ function App() {
           />
           <Route
             path="/observations/:patientId"
-            element={<AuthenticationGuard component={Observations} />}
+            element={
+              <AuthenticationGuard component={PatientObservationsList} />
+            }
           />
           <Route
             path="/observations/addObservation/:patientId"
