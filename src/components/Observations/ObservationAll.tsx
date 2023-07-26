@@ -22,7 +22,15 @@ const ObservationAll: React.FC = () => {
     fetchObservations();
   }, [observationsPerPage, offsetObservationsPerPage, getAccessTokenSilently]);
 
-  // Fetch observations from the Server
+  /**
+   * Asynchronous function to fetch observations from the server.
+   * It uses silent authentication to get the access token.
+   * If successful, it maps over each resource entry and stores the resources in state.
+   * On error, it logs the error message.
+   * @async
+   * @function fetchObservations
+   * @returns {Promise<void>}
+   */
   const fetchObservations = async () => {
     const token = await getAccessTokenSilently();
     try {
@@ -61,7 +69,11 @@ const ObservationAll: React.FC = () => {
     }
   };
 
-  // Navigate to the Observation detail page with the patientId as a parameter
+  /**
+   * Function to handle row click and navigate to the Observation detail page with the observationId as a parameter
+   * @function handleRowClick
+   * @param {string | undefined} observationId - The ID of the Observation
+   */
   const handleRowClick = (observationId: string | undefined) => {
     if (observationId) {
       // Navigate to the patient detail page with the patientId as a parameter
@@ -69,7 +81,11 @@ const ObservationAll: React.FC = () => {
     }
   };
 
-  // Filter observations based on the selected attribute and search text
+  /**
+   * Function to filter and sort observations based on selected attribute and search text
+   * @function filterAndSortObservations
+   * @returns {fhirR4.Observation[]} - The sorted and filtered observations
+   */
   const filterAndSortObservations = () => {
     const filteredObservations = filterResources(
       observations,
@@ -83,34 +99,57 @@ const ObservationAll: React.FC = () => {
     return sortedObservations;
   };
 
-  // Handle search input change
+  /**
+   * Function to handle search input change and set the searchText state
+   * @function handleSearch
+   * @param {React.ChangeEvent<HTMLInputElement>} event - The input change event
+   */
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
   };
 
-  // Handle attributes selection change
+  /**
+   * Function to handle filter attribute selection change and set the filterAttribute state
+   * @function handleFilterAttributeChange
+   * @param {React.ChangeEvent<HTMLSelectElement>} event - The select change event
+   */
   const handleFilterAttributeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setFilterAttribute(event.target.value);
   };
-
+  /**
+   * Function to handle sort attribute selection change and set the sortAttribute state
+   * @function handleSortAttributeChange
+   * @param {React.ChangeEvent<HTMLSelectElement>} event - The select change event
+   */
   const handleSortAttributeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setSortAttribute(event.target.value);
   };
 
-  // Refresh the observation data by fetching observations again
+  /**
+   * Function to refresh the observation data by fetching observations again
+   * @function handleRefresh
+   */
   const handleRefresh = () => {
     fetchObservations(); // Fetch observations again to refresh the data
   };
-
+  /**
+   * Function to handle observationsPerPage change and set the observationsPerPage state
+   * @function handleObservationsPerPageChange
+   * @param {string} value - The new value
+   */
   const handleObservationsPerPageChange = (value: string) => {
     const parsedValue = parseInt(value, 10);
     setObservationsPerPage(parsedValue);
   };
-
+  /**
+   * Function to handle offsetObservationsPerPage change and set the offsetObservationsPerPage state
+   * @function handleOffsetObservationPerPageChange
+   * @param {number} value - The new value
+   */
   const handleOffsetObservationPerPageChange = (value: number) => {
     if (value < 0) {
       value = 0;
