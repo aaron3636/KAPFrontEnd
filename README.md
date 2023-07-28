@@ -2,12 +2,25 @@
 
 Welcome to the KAPFrontEnd repository, the frontend component of the Klinisches Anwendungsprojekt (Clinical Application Project). This project is built with React, providing a user-friendly interface to interact with the clinical data resources served by the [backend server](https://github.com/aaron3636/KAP).
 
-## Absrtact
+## Abstract
 This project was an educational endeavor aimed at designing and implementing a medical application for managing patients and their observations. The primary objectives were to apply and extend our knowledge in software development, particularly focusing on the application structuring, basic security implementation, and understanding the usage of Fast Healthcare Interoperability Resources (FHIR). The application aimed to provide a practical solution to streamline patient management, specifically addressing certain use cases within the healthcare field. Throughout the process, we learned essential skills in defining a workflow, reflecting on the complexities and the interrelation of tasks within a software project. The experience gleaned from this project sheds light on the real-world application of theoretical knowledge in a highly critical field like healthcare and contributes to our practical proficiency in software development.
 
 ## Getting Started
 
 To get started with the KAPFrontEnd, follow these steps:
+
+1. **Install Node.js:**
+   Before installing npm, you need to have Node.js installed on your machine. npm is the default package manager that comes with Node.js. If you don't have Node.js installed, you can download and install it from the official Node.js website: https://nodejs.org/
+
+2. **Verify Installation:**
+   After installing Node.js, you can check if npm is installed by opening your terminal or command prompt and running the following commands:
+   ```
+   node -v
+   npm -v
+   ```
+   These commands will display the installed versions of Node.js and npm, respectively.
+
+Once you have successfully installed and set up npm, you can proceed with the installation steps for the KAPFrontEnd repository: 
 
 1. **Clone / Start the server:**
    - Follow the steps provided [here](https://github.com/aaron3636/KAP) to clone and start the backend server.
