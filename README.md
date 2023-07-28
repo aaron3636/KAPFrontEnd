@@ -1,7 +1,9 @@
 # KAPFrontEnd - Clinical Application Frontend
 
-Welcome to the KAPFrontEnd repository, the frontend component of the Klinisches Anwendungsprojekt (Clinical Application Project). This project is built with 
-React, providing a user-friendly interface to interact with the clinical data resources served by the [backend server](https://github.com/aaron3636/KAP).
+Welcome to the KAPFrontEnd repository, the frontend component of the Klinisches Anwendungsprojekt (Clinical Application Project). This project is built with React, providing a user-friendly interface to interact with the clinical data resources served by the [backend server](https://github.com/aaron3636/KAP).
+
+## Absrtact
+This project was an educational endeavor aimed at designing and implementing a medical application for managing patients and their observations. The primary objectives were to apply and extend our knowledge in software development, particularly focusing on the application structuring, basic security implementation, and understanding the usage of Fast Healthcare Interoperability Resources (FHIR). The application aimed to provide a practical solution to streamline patient management, specifically addressing certain use cases within the healthcare field. Throughout the process, we learned essential skills in defining a workflow, reflecting on the complexities and the interrelation of tasks within a software project. The experience gleaned from this project sheds light on the real-world application of theoretical knowledge in a highly critical field like healthcare and contributes to our practical proficiency in software development.
 
 ## Getting Started
 
@@ -28,6 +30,7 @@ To get started with the KAPFrontEnd, follow these steps:
    The app will be accessible at http://localhost:3000 in your web browser.
 
 By following these steps, you will have both the backend server and the frontend application up and running, enabling seamless interaction with the clinical data resources. Should you have any questions or need assistance, feel free to reach out. Happy testing!
+
 ## Available Scripts
 
 In the KAPFrontEnd project directory, you can use the following scripts:
@@ -47,5 +50,7 @@ For more information about Create React App and React itself, refer to the follo
 - [Create React App documentation](https://create-react-app.dev/docs/getting-started/)
 
 - [React documentation](https://reactjs.org/docs/getting-started.html)
+
+- [HAPI-FHIR](https://hapifhir.io/hapi-fhir/docs/)
 
 We hope this frontend component enhances your experience with the Klinisches Anwendungsprojekt. Should you have any questions or need assistance, feel free to reach out. Happy testing!
