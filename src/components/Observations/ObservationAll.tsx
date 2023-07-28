@@ -5,14 +5,15 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { filterResources, sortResources } from "../Utils/utils";
 import Banner from "../elements/Banner";
 import { useNavigate } from "react-router-dom";
+import { getDisplayTextForCode, displayReferenceRange } from "../Utils/utils";
 
 const ObservationAll: React.FC = () => {
   // State variables
   const { getAccessTokenSilently } = useAuth0();
   const [observations, setObservations] = useState<fhirR4.Observation[]>([]);
   const [searchText, setSearchText] = useState("");
-  const [filterAttribute, setFilterAttribute] = useState("code");
-  const [sortAttribute, setSortAttribute] = useState("date");
+  const [filterAttribute, setFilterAttribute] = useState("");
+  const [sortAttribute, setSortAttribute] = useState("");
   const [observationsPerPage, setObservationsPerPage] = useState(20);
   const [offsetObservationsPerPage, setoffsetObservationsPerPage] = useState(0);
   const navigate = useNavigate();
@@ -20,7 +21,12 @@ const ObservationAll: React.FC = () => {
   // Fetch observations when the component mounts
   useEffect(() => {
     fetchObservations();
-  }, [observationsPerPage, offsetObservationsPerPage, getAccessTokenSilently]);
+  }, [
+    observationsPerPage,
+    offsetObservationsPerPage,
+    getAccessTokenSilently,
+    searchText,
+  ]);
 
   /**
    * Asynchronous function to fetch observations from the server.
@@ -35,7 +41,9 @@ const ObservationAll: React.FC = () => {
     const token = await getAccessTokenSilently();
     try {
       const response = await fetch(
-        "http://localhost:8080/fhir/Observation?_count=" +
+        "http://localhost:8080/fhir/Observation?" +
+          (searchText == "" ? searchText : searchText + "&") +
+          "_count=" +
           observationsPerPage +
           "&_offset=" +
           offsetObservationsPerPage,
@@ -47,7 +55,9 @@ const ObservationAll: React.FC = () => {
       );
 
       console.log(
-        "http://localhost:8080/fhir/Patient?_count=" +
+        "http://localhost:8080/fhir/Observation?" +
+          (searchText == "" ? searchText : searchText + "&") +
+          "_count=" +
           observationsPerPage +
           "&_offset=" +
           offsetObservationsPerPage
@@ -59,6 +69,7 @@ const ObservationAll: React.FC = () => {
         const observationsData = data.entry.map(
           (entry: BundleEntry) => entry.resource
         );
+        console.log(observationsData);
         // Store the extracted observations in state
         setObservations(observationsData);
       } else {
@@ -87,11 +98,13 @@ const ObservationAll: React.FC = () => {
    * @returns {fhirR4.Observation[]} - The sorted and filtered observations
    */
   const filterAndSortObservations = () => {
+    console.log(observations);
     const filteredObservations = filterResources(
       observations,
       filterAttribute,
       searchText
     );
+    console.log(filteredObservations);
     const sortedObservations = sortResources(
       filteredObservations,
       sortAttribute
@@ -189,7 +202,7 @@ const ObservationAll: React.FC = () => {
             className="rounded border-b-2 mr-2"
             type="text"
             value={searchText}
-            onChange={handleSearch}
+            onChange={(e) => setSearchText(e.target.value)}
             placeholder="Search"
           />
           <button
@@ -240,37 +253,38 @@ const ObservationAll: React.FC = () => {
         </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
+        <table className="w-full border-collapse border">
           <thead>
-            <tr>
-              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
+            <tr className="bg-gray-100">
+              <th className="p-4 font-semibold text-center border">
                 Identifier
               </th>
-              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                Subject
+              <th className="p-4 font-semibold text-center border">Status</th>
+              <th className="p-4 font-semibold text-center border">Type</th>
+              <th className="p-4 font-semibold text-center whitespace-nowrap border">
+                Issue Date
               </th>
-              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                Code
+              <th className="p-4 font-semibold text-center whitespace-nowrap border">
+                Body Site
               </th>
-              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                Category
+              <th className="p-4 font-semibold text-center border">
+                Interpretation
               </th>
-              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                Effective Date
+              <th className="p-4 font-semibold text-center border">Range</th>
+              <th className="p-4 font-semibold text-center border">
+                Performer
               </th>
-              <th className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                Value
-              </th>
+              <th className="p-4 font-semibold text-center border">Note</th>
             </tr>
           </thead>
           <tbody>
             {filterAndSortObservations().map((observation) => (
               <tr
                 key={observation.id}
-                onClick={() => handleRowClick(observation.id)}
                 className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleRowClick(observation.id)}
               >
-                <td className="p-4 font-mono md:font-mono text-lg/2 md:text-lg/2 whitespace-nowrap">
+                <td className="p-4 font-mono md:font-mono text-lg/2 md:text-lg/2 border whitespace-nowrap">
                   {observation.identifier?.[0]?.value === undefined ? (
                     <div className="flex items-center justify-center h-full">
                       Nun
@@ -279,28 +293,33 @@ const ObservationAll: React.FC = () => {
                     observation.identifier?.[0]?.value
                   )}
                 </td>
-                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                  <a
-                    href={
-                      "http://localhost:3000/" + observation.subject?.reference
-                    }
-                  >
-                    {observation.subject?.display}
-                  </a>
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 border">
+                  {observation.status}
                 </td>
-                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                  {observation.code.text}
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 border">
+                  {observation.category?.[0]?.coding?.[0]?.code || "-"}
                 </td>
-                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                  {observation?.category?.[0].text}
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 border">
+                  {observation.issued}
                 </td>
-                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                  {observation.effectiveDateTime}
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 border whitespace-nowrap">
+                  {observation.bodySite?.text || "-"}
                 </td>
-                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5">
-                  {observation.valueQuantity
-                    ? `${observation.valueQuantity.value} ${observation.valueQuantity.unit}`
-                    : "Nun"}
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 border whitespace-nowrap">
+                  {observation.interpretation?.[0]?.coding?.[0]?.display
+                    ? getDisplayTextForCode(
+                        observation.interpretation?.[0]?.coding?.[0]?.display
+                      )
+                    : "-"}
+                </td>
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 border whitespace-nowrap">
+                  {displayReferenceRange(observation.referenceRange)}
+                </td>
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 border whitespace-nowrap">
+                  {observation.performer?.[0]?.display || "-"}
+                </td>
+                <td className="p-4 font-mono md:font-mono text-lg/5 md:text-lg/5 border whitespace-nowrap">
+                  {observation.note?.[0]?.text || "-"}
                 </td>
               </tr>
             ))}
