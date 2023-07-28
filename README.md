@@ -1,69 +1,89 @@
-# KAPFrontEnd - Clinical Application Frontend
+# Clinical Application Project (CAP)
 
-Welcome to the KAPFrontEnd repository, the frontend component of the Klinisches Anwendungsprojekt (Clinical Application Project). This project is built with React, providing a user-friendly interface to interact with the clinical data resources served by the [backend server](https://github.com/aaron3636/KAP).
+Welcome to CAP! This repository includes a server and client application suite designed to revolutionize the evaluation of clinical data resources. The server, built on top of the open-source [Hapi-FHIR](https://hapifhir.io/) project, features Auth0 bearer token authentication to secure your data.
 
-## Abstract
-This project was an educational endeavor aimed at designing and implementing a medical application for managing patients and their observations. The primary objectives were to apply and extend our knowledge in software development, particularly focusing on the application structuring, basic security implementation, and understanding the usage of Fast Healthcare Interoperability Resources (FHIR). The application aimed to provide a practical solution to streamline patient management, specifically addressing certain use cases within the healthcare field. Throughout the process, we learned essential skills in defining a workflow, reflecting on the complexities and the interrelation of tasks within a software project. The experience gleaned from this project sheds light on the real-world application of theoretical knowledge in a highly critical field like healthcare and contributes to our practical proficiency in software development.
+## Project Overview
 
-## Getting Started
+The CAP project emerged from an academic initiative that set out to create a healthcare application for managing patient data and related observations. The objectives were manifold, ranging from expanding our software development knowledge base to understanding Fast Healthcare Interoperability Resources (FHIR) use. Our end goal was to design an application capable of enhancing patient management processes to address specific use-cases within the healthcare domain. This project gave us valuable insights into software project management and allowed us to apply theoretical knowledge to practical use-cases in the critical field of healthcare.
 
-To get started with the KAPFrontEnd, follow these steps:
+## Contents
+
+- [Project Scope](#project-scope)
+- [Frontend Integration](frontend-integration)
+- [Client - PatientGenerator](#client---patientgenerator)
+- [Server Configuration](#server-configuration)
+- [Installation and Setup](#installation-and-setup)
+- [Usage Instructions](#usage-instructions)
+- [Acknowledgments](#acknowledgments)
+- [License](#license)
+
+## Project Scope
+
+In the realm of clinical applications, having a robust and user-friendly environment for testing various resources is indispensable. Our project aims to provide an effective solution for server testing with clinical data resources. The server, powered by Hapi-FHIR, offers multiple RESTful endpoints, augmented with bearer token authentication for improved security.
+
+## Frontend Integration
+
+Our server repository seamlessly meshes with the frontend component of the project. Together, they create a comprehensive solution for clinical application testing, offering an intuitive interface to interact with clinical data resources.
+
+Explore the [FrontEnd](https://github.com/GravityDarkLab/Clinical-Application-Project/tree/main/Front-end) to unlock the full potential of CAP. The frontend enhances the user experience and extends the server's functionality.
+
+## Client - PatientGenerator
+
+The `PatientGenerator-client` is a mock client application devised to create random patient data and engage with the server via HTTP requests. This setup enables users to simulate real-world scenarios and evaluate the server's handling of different resources.
+
+## Server Configuration
+
+Our `server` directory, based on Hapi-FHIR, serves as the core component of the project. Customized to meet our application's unique requirements, we've added bearer token authentication to secure the server and protect sensitive patient data.
+
+## Installation and Setup
 
 1. **Install Node.js:**
-   Before installing npm, you need to have Node.js installed on your machine. npm is the default package manager that comes with Node.js. If you don't have Node.js installed, you can download and install it from the official Node.js website: https://nodejs.org/
+   Ensure Node.js is installed on your machine before installing npm (comes bundled with Node.js). If not, you can download and install it from the official [Node.js website](https://nodejs.org/).
 
-2. **Verify Installation:**
-   After installing Node.js, you can check if npm is installed by opening your terminal or command prompt and running the following commands:
+2. **Confirm Installation:**
+   Post-installation, verify if npm is installed by running the following commands in your terminal/command prompt:
    ```
    node -v
    npm -v
    ```
-   These commands will display the installed versions of Node.js and npm, respectively.
+   These commands will return the installed versions of Node.js and npm.
 
-Once you have successfully installed and set up npm, you can proceed with the installation steps for the KAPFrontEnd repository: 
+To kickstart with CAP, follow these steps:
 
-1. **Clone / Start the server:**
-   - Follow the steps provided [here](https://github.com/aaron3636/KAP) to clone and start the backend server.
-   - Alternatively, you can download the built and ready-to-use server directly from [here](https://drive.google.com/drive/folders/1pery1-VEiU5qInV35zOIW4Vb3jjmPfdU?usp=drive_link).
-
-2. **Clone the Repository:** Begin by cloning this repository to your local machine using the following command:
+1. **Clone the Repository:** Clone this repository onto your local machine with:
    ```
-   git clone https://github.com/aaron3636/KAPFrontEnd.git
+   git clone https://github.com/GravityDarkLab/Clinical-Application-Project.git
    ```
 
-3. **Install Dependencies:** Navigate to the project directory and install the required dependencies using npm:
+2. **Server Configuration:** Navigate to the `server` directory and follow the provided instructions for server setup. Make sure you've installed all necessary dependencies.
+
+3. **Optional: Download the Server:** Optionally, download the prebuilt server [here](https://drive.google.com/drive/folders/1pery1-VEiU5qInV35zOIW4Vb3jjmPfdU?usp=drive_link) and follow the instructions in the Readme.
+
+4. **Build the PatientGenerator:** Navigate to the `PatientGenerator-client` directory, update the configurations (if needed) to match your server's endpoint, build the client application, and start testing the server's response to different resources and HTTP methods.
+
+5. **Frontend Setup:** Navigate to the frontend directory and install the required dependencies with npm:
    ```
    npm install
    ```
 
-4. **Run the Development Server:** Start the development server by running the following command:
+6. **Launch Development Server:** Start the development server with:
    ```
    npm start
    ```
-   The app will be accessible at http://localhost:3000 in your web browser.
+   Access the app at http://localhost:3000 in your web browser.
 
-By following these steps, you will have both the backend server and the frontend application up and running, enabling seamless interaction with the clinical data resources. Should you have any questions or need assistance, feel free to reach out. Happy testing!
+## Usage Instructions
 
-## Available Scripts
+The preceding steps help set up both the backend server and frontend application, enabling smooth interaction with the clinical data resources. If you encounter any issues or need assistance, don't hesitate to contact us.
 
-In the KAPFrontEnd project directory, you can use the following scripts:
+## Acknowledgments
 
-- `npm start`: Runs the app in the development mode. Open http://localhost:3000 to view it in the browser. The page will reload automatically if you make edits.
+We extend our heartfelt gratitude to the [Hapi-FHIR](https://github.com/hapifhir/hapi-fhir-jpaserver-starter) community for providing the fundamental server component for CAP. Their dedication to open-source healthcare solutions has been instrumental in fostering healthcare interoperability.
 
-- `npm test`: Launches the test runner in interactive watch mode. Use this for testing your application.
+## License
 
-- `npm run build`: Builds the app for production to the `build` folder. The production build is optimized for better performance.
+CAP is licensed under the [MIT License](LICENSE). You are free to use, modify, and distribute the code in line with the license terms.
 
-- `npm run eject`: This is a one-way operation and should be used with caution. It allows you to have full control over the build tool and configuration choices. Note that this is not recommended for small and middle deployments.
+---
 
-## Learn More
-
-For more information about Create React App and React itself, refer to the following resources:
-
-- [Create React App documentation](https://create-react-app.dev/docs/getting-started/)
-
-- [React documentation](https://reactjs.org/docs/getting-started.html)
-
-- [HAPI-FHIR](https://hapifhir.io/hapi-fhir/docs/)
-
-We hope this frontend component enhances your experience with the Klinisches Anwendungsprojekt. Should you have any questions or need assistance, feel free to reach out. Happy testing!
+Thanks for your interest in CAP. We hope this project serves as a valuable resource in your clinical application testing journey. For further assistance or inquiries, please reach out to us. Happy testing!
