@@ -56,7 +56,7 @@ const EditPatientForm: React.FC<EditPatientFormProps> = ({
       // If a new photo file was provided, update photoFile state
       const file = files[0];
       setPhotoFile(file);
-    } else if (name == "given") {
+    } else if (name === "given") {
       
       setEditedPatient((prevPatient) => {
         const updatedPatient = { ...prevPatient };
@@ -73,7 +73,7 @@ const EditPatientForm: React.FC<EditPatientFormProps> = ({
         return updatedPatient;
       });
 
-    } else if (name == "family") {
+    } else if (name === "family") {
 
       setEditedPatient((prevPatient) => {
         const updatedPatient = { ...prevPatient };

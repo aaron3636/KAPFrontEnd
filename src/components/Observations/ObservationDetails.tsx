@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { fhirR4 } from "@smile-cdr/fhirts";
 import { RenderObservations } from "../Utils/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import EditObservationForm from "./EditObservationForm";
 import BundleEntry from "../Utils/BundleEntry";

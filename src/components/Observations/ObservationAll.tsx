@@ -42,7 +42,7 @@ const ObservationAll: React.FC = () => {
     try {
       const response = await fetch(
         "http://localhost:8080/fhir/Observation?" +
-          (searchText == "" ? searchText : searchText + "&") +
+          (searchText === "" ? searchText : searchText + "&") +
           "_count=" +
           observationsPerPage +
           "&_offset=" +
@@ -192,7 +192,7 @@ const ObservationAll: React.FC = () => {
             className="rounded border-b-2 mr-2"
             type="text"
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={handleSearch}
             placeholder="Search"
           />
           <button
