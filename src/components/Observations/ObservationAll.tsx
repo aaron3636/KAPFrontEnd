@@ -54,22 +54,12 @@ const ObservationAll: React.FC = () => {
         }
       );
 
-      console.log(
-        "http://localhost:8080/fhir/Observation?" +
-          (searchText == "" ? searchText : searchText + "&") +
-          "_count=" +
-          observationsPerPage +
-          "&_offset=" +
-          offsetObservationsPerPage
-      );
-
       const data = await response.json();
       // Extract the resource property from the Bundle entry
       if ("entry" in data) {
         const observationsData = data.entry.map(
           (entry: BundleEntry) => entry.resource
         );
-        console.log(observationsData);
         // Store the extracted observations in state
         setObservations(observationsData);
       } else {
@@ -98,13 +88,13 @@ const ObservationAll: React.FC = () => {
    * @returns {fhirR4.Observation[]} - The sorted and filtered observations
    */
   const filterAndSortObservations = () => {
-    console.log(observations);
+   
     const filteredObservations = filterResources(
       observations,
       filterAttribute,
       searchText
     );
-    console.log(filteredObservations);
+
     const sortedObservations = sortResources(
       filteredObservations,
       sortAttribute

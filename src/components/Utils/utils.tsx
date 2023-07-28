@@ -318,7 +318,6 @@ export const RenderObservations = ({ media }: { media: fhirR4.Media[] }) => {
     );
   };
 
-  console.log(media);
   if (!media || media.length === 0) {
     return <div>No attachment available</div>;
   }

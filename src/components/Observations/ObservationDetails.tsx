@@ -194,7 +194,6 @@ const ObservationDetails = () => {
       );
       if (response.ok) {
         setObservation(editedObservation);
-        console.log(response);
         setIsEditMode(false);
       } else {
         console.error("Failed to save patient data");
@@ -250,8 +249,9 @@ const ObservationDetails = () => {
         for (const derivedFrom of observationData.derivedFrom) {
           try {
             // Delete the Media based on the derivedFrom reference
+
             await fetch(
-              `http://localhost:8080/fhir/Media/${derivedFrom.reference}`,
+              `http://localhost:8080/fhir/Media?identifier=${derivedFrom.identifier.value}`,
               {
                 method: "DELETE",
                 headers: {

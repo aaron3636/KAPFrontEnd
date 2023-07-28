@@ -56,6 +56,40 @@ const EditPatientForm: React.FC<EditPatientFormProps> = ({
       // If a new photo file was provided, update photoFile state
       const file = files[0];
       setPhotoFile(file);
+    } else if (name == "given") {
+      
+      setEditedPatient((prevPatient) => {
+        const updatedPatient = { ...prevPatient };
+
+        const newHumanName = new fhirR4.HumanName();
+        newHumanName.prefix = (updatedPatient.name !== undefined && updatedPatient.name[0] !== undefined && updatedPatient.name[0].prefix !== undefined ? updatedPatient.name[0].prefix : []);
+
+        newHumanName.family = (updatedPatient.name !== undefined && updatedPatient.name[0] !== undefined && updatedPatient.name[0].family !== undefined ? updatedPatient.name[0].family : "");
+
+        newHumanName.given = (updatedPatient.name !== undefined && updatedPatient.name[0] !== undefined && updatedPatient.name[0].prefix !== undefined ? [value] : []);
+
+        updatedPatient.name = [newHumanName];
+
+        return updatedPatient;
+      });
+
+    } else if (name == "family") {
+
+      setEditedPatient((prevPatient) => {
+        const updatedPatient = { ...prevPatient };
+
+        const newHumanName = new fhirR4.HumanName();
+        newHumanName.prefix = (updatedPatient.name !== undefined && updatedPatient.name[0] !== undefined && updatedPatient.name[0].prefix !== undefined ? updatedPatient.name[0].prefix : []);
+
+        newHumanName.family = (updatedPatient.name !== undefined && updatedPatient.name[0] !== undefined && updatedPatient.name[0].family !== undefined ? value : "");
+
+        newHumanName.given = (updatedPatient.name !== undefined && updatedPatient.name[0] !== undefined && updatedPatient.name[0].prefix !== undefined ? updatedPatient.name[0].given : []);
+
+        updatedPatient.name = [newHumanName];
+
+        return updatedPatient;
+      });
+
     } else {
       // For other fields, update the corresponding field in the editedPatient object
       setEditedPatient((prevPatient) => ({

@@ -111,13 +111,13 @@ const PatientForm: React.FC = () => {
         code:
           (
             e.currentTarget.elements.namedItem(
-              "martialStatus"
+              "maritalStatus"
             ) as HTMLSelectElement
           ).value ?? "",
         display:
           (
             e.currentTarget.elements.namedItem(
-              "martialStatus"
+              "maritalStatus"
             ) as HTMLSelectElement
           ).selectedOptions[0].textContent ?? "",
       },

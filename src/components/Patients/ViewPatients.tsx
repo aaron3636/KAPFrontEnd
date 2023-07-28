@@ -56,18 +56,10 @@ const PatientList: React.FC = () => {
           },
         }
       ); // Replace with your API endpoint
-
-      console.log(
-        "http://localhost:8080/fhir/Patient?_count=" +
-          patientsPerPage +
-          "&_offset=" +
-          offsetPatientsPerPage
-      );
       const data = await response.json();
       // Extract the resource property from the Bundle entry
 
       if ("entry" in data) {
-        console.log(data);
         const patientsData = data.entry.map(
           (entry: BundleEntry) => entry.resource
         );
@@ -76,7 +68,6 @@ const PatientList: React.FC = () => {
       } else {
         //TODO : What should happen if we have reached the limit. Some warning?
       }
-      //console.log(patientsData);
     } catch (error) {
       console.error("Error fetching patients:", error);
     }
@@ -178,7 +169,6 @@ const PatientList: React.FC = () => {
     if (value < 0) {
       value = 0;
     }
-    console.log(value);
     setoffsetPatientsPerPage(value);
   };
 

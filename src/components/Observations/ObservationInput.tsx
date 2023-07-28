@@ -190,17 +190,7 @@ const ObservationInput: React.FC = () => {
           resourceType: "Media",
         };
 
-        //derivedFrom.push(referenceMedia);
-
-        console.log(JSON.stringify(media));
-
-        try {
-          await post("Media", media, token, setSubmissionStatus);
-          derivedFrom.push(referenceMedia);
-          setSubmissionStatus("success");
-        } catch (error) {
-          setSubmissionStatus("failure");
-        }
+        derivedFrom.push(referenceMedia);
 
         fetch("http://localhost:8080/fhir/Media", {
           method: "POST",
@@ -227,8 +217,6 @@ const ObservationInput: React.FC = () => {
           });
       }
 
-      console.log(derivedFrom);
-
       const observation: fhirR4.Observation = {
         identifier: [newIdentifier],
         status: statusObservation,
@@ -245,7 +233,6 @@ const ObservationInput: React.FC = () => {
         resourceType: "Observation",
       };
 
-      console.log(JSON.stringify(observation));
       try {
         await post("Observation", observation, token, setSubmissionStatus);
         setSubmissionStatus("success");
@@ -416,6 +403,7 @@ const ObservationInput: React.FC = () => {
               className="rounded border-b-2"
               type="text"
               name="interpretation"
+              required
             />
           </label>
           <br />

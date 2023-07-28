@@ -53,7 +53,6 @@ const PatientObservationsList = () => {
     if (value < 0) {
       value = 0;
     }
-    console.log(value);
     setoffsetMediaPerPage(value);
   };
   /**
@@ -93,7 +92,6 @@ const PatientObservationsList = () => {
         (entry: BundleEntry) => entry.resource
       );
 
-      console.log(patientsData);
       setMedia(patientsData);
     } catch (error) {
       console.error("Error fetching patient:", error);
